@@ -1,20 +1,9 @@
 """Tests for spark_apps.rdd.add_numbers."""
 
-from collections.abc import Iterator
-
 import pytest
-from pyspark import SparkConf, SparkContext
+from pyspark import SparkContext
 
 from spark_apps.rdd.add_numbers import add_numbers
-
-
-@pytest.fixture(scope="module")
-def spark_context() -> Iterator[SparkContext]:
-    conf = SparkConf().setAppName("test-add-numbers").setMaster("local[2]")
-    context = SparkContext(conf=conf)
-    context.setLogLevel("ERROR")
-    yield context
-    context.stop()
 
 
 class TestAddNumbers:
