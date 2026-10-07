@@ -6,4 +6,9 @@ spark-warehouse/
 metastore_db/
 derby.log
 .vscode/
-Dulcinea.txt/
+output/
+.venv/
+venv/
+.coverage
+build/
+dist/
