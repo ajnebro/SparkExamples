@@ -13,11 +13,12 @@ must be written in **English**.
 
 ## Environment
 
-- Use the Conda environment **`spark420`**: `conda activate spark420`, or run commands with
-  `conda run -n spark420 <command>`.
+- Use the project's virtual environment, named **`spark420`** by default (Conda:
+  `conda activate spark420`, or `conda run -n spark420 <command>`). If the environment has
+  another name, use that one. See [environment.yml](environment.yml) and the README.
 - Do not install packages in the base environment or in any other environment. If a
-  dependency is missing, add it to `spark420` and declare it in `pyproject.toml`.
-- Java (a JDK supported by Spark 4.2) is required to run PySpark.
+  dependency is missing, add it to the project environment and declare it in `pyproject.toml`.
+- Java 17 or later is required to run PySpark.
 
 ## Project layout
 
@@ -25,30 +26,33 @@ must be written in **English**.
 src/rdd/             Examples based on the RDD API (top-level package `rdd`)
 src/dataframes/      Planned: examples based on the DataFrame API
 tests/               pytest tests, mirroring the layout of src/
-data/                Small input files used by the examples
+data/                Input files used by the examples (`output/` is git-ignored)
 pyproject.toml       Package metadata, dependencies, ruff and pytest configuration
-Makefile             install / test / lint / format targets
+Makefile             install / test / lint / format / check / clean targets
+environment.yml      Conda environment definition
 ```
 
 ## Commands
 
-| Task                         | Command                           |
-| ---------------------------- | --------------------------------- |
-| Install in editable mode     | `make install`                    |
-| Run tests                    | `make test` (`pytest tests/ -x`)  |
-| Lint                         | `make lint` (`ruff check`)        |
-| Format                       | `make format` (`ruff format`)     |
-| Run an example               | `python -m rdd.add_numbers` |
-| Submit an example            | `spark-submit src/rdd/<file>.py` |
+| Task                         | Command                                     |
+| ---------------------------- | ------------------------------------------- |
+| Install in editable mode     | `make install`                              |
+| Run tests                    | `make test` (`pytest tests/ -x`)            |
+| Run tests, skipping smoke    | `make test-fast`                            |
+| Lint                         | `make lint` (`ruff check`)                  |
+| Format                       | `make format` (`ruff format`)               |
+| Lint + format check + tests  | `make check`                                |
+| Run an example               | `python -m rdd.add_numbers`                 |
+| Submit an example            | `spark-submit src/rdd/<file>.py`            |
 
-Run `make test` and `make lint` before proposing a commit.
+Run `make check` before proposing a commit.
 
 ## Code conventions
 
-- Annotate parameters and return types on new or modified code; use `|` for unions.
+- Annotate parameters and return types; use `|` for unions.
 - Google-style docstrings (Args / Returns / Raises).
-- One `return` per function (except validation guards), functions of at most ~20 lines,
-  cognitive complexity of at most 10, no nested conditionals.
+- One `return` per function (except validation guards), short and simple functions (at most
+  ~20 lines), no nested conditionals.
 - Raise specific exceptions (`ValueError`, `TypeError`, ...) for invalid input; use `with`
   for resources.
 - Formatting and linting with **ruff** (line length 100).
@@ -71,6 +75,8 @@ Run `make test` and `make lint` before proposing a commit.
 - Cover both success and failure paths.
 - Use the shared session-scoped `spark_context` fixture from
   [tests/conftest.py](tests/conftest.py); do not create a new context per test.
+- Every example also has a smoke test in `tests/rdd/test_examples_smoke.py` (marker `smoke`)
+  that runs it as a separate process; register new examples there.
 
 ## Git workflow
 
@@ -80,6 +86,6 @@ Run `make test` and `make lint` before proposing a commit.
   `chore`, `revert`.
 - Commits are atomic: one logical change each. Never mix production code with tests, or code
   with documentation.
+- Work happens on `main`; use topic branches and squash-merge for larger changes.
 - **Do not commit or push unless explicitly asked.**
-- The "Branches and releases" section of GIT_GUIDELINES.md describes the Evolver-Studio
-  release flow; apply it only if this repository adopts that flow.
+
