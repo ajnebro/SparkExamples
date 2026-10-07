@@ -13,7 +13,7 @@ This project follows the [Conventional Commits](https://www.conventionalcommits.
 ```
 
 - Subject line: imperative mood ("add", not "added"/"adds"), no trailing period, ≤ 72 characters.
-- `scope` is optional and names the affected area, e.g. `operator`, `algorithm`, `problem`, `util`, `lab`, `docs`.
+- `scope` is optional and names the affected area, e.g. `rdd`, `dataframes`, `build`, `docs`.
 - `!` after the type/scope marks a breaking change (see below).
 - Identifiers and messages must be in **English**, per [CODING_GUIDELINES.md](CODING_GUIDELINES.md).
 
@@ -21,7 +21,7 @@ This project follows the [Conventional Commits](https://www.conventionalcommits.
 
 | Type       | When to use                                                         |
 | ---------- | ------------------------------------------------------------------- |
-| `feat`     | A new feature, algorithm, operator, problem, or public method       |
+| `feat`     | A new feature, example, or public function                         |
 | `fix`      | A bug fix                                                           |
 | `perf`     | A change that improves performance without changing behavior        |
 | `test`     | Adding or correcting tests (no production code)                     |
@@ -35,17 +35,17 @@ This project follows the [Conventional Commits](https://www.conventionalcommits.
 
 ## Breaking changes
 
-Mark commits that change or remove a public API (e.g. `Algorithm`, `Problem`, `Solution`, `Operator` signatures) with `!`:
+Mark commits that change or remove a public API (e.g. the signature of a public function) with `!`:
 
 ```
-feat(operator)!: change PolynomialMutation constructor argument order
+feat(rdd)!: change the argument order of add_numbers
 ```
 
 Explain the impact and migration in the body/footer:
 
 ```
-BREAKING CHANGE: `PolynomialMutation` now takes `distribution_index` before
-`probability`. Update call sites accordingly.
+BREAKING CHANGE: `add_numbers` now takes `numbers` before `spark_context`.
+Update call sites accordingly.
 ```
 
 ## Body and footers
@@ -61,42 +61,27 @@ Each commit must represent **one single logical change**. Guidelines:
 - If the commit message needs "and" to describe what it does, split it into two commits.
 - Before committing, run the checks relevant to the change:
   - `make test` (or `pytest tests/ -x`) — tests pass
-  - `make lint` — `ruff` is clean
+  - `make lint` and `make format-check` — `ruff` is clean
+  - `make check` runs all of them
 - Never mix production code changes with test changes in the same commit.
 - Never mix code changes with documentation changes in the same commit.
 
-## Branches and releases
+## Branches
 
-Evolver-Studio has its own version numbers (`MAJOR.MINOR.PATCH`), independent of Evolver's. The
-workflow is Evolver's:
-
-- **`develop`** is where the work happens, as atomic commits. Its version is the upcoming release
-  with a `.dev0` suffix (`pyproject.toml`: `0.2.0.dev0`, PEP 440's form of Evolver's `-SNAPSHOT`),
-  and the top section of [CHANGELOG.md](CHANGELOG.md) is that release, marked `(unreleased)`. Every
-  user-visible change adds an entry to it, in the same commit as its documentation.
-- **`main`** holds the releases only, and moves only when a release is cut (or when asked).
-- **A release** is a `chore(release): prepare release X.Y.Z` commit on `develop` (the version in
-  `pyproject.toml`, the changelog section dated, the version and the Evolver release it works with
-  in the README), then the annotated tag `vX.Y.Z` ("Evolver-Studio X.Y.Z") and `main`
-  fast-forwarded to it, and the release on GitHub. Right after, a
-  `chore: start X.Y+1.0.dev0 development` commit on `develop` opens the next version.
-- Studio follows **stable Evolver releases only** (`EVOLVER_VERSION`): moving to a new one is the
-  `/bump-evolver` command, on `develop`. Work against an Evolver `develop` build goes on an
-  `experiment/*` branch.
-
-Merging a branch other than `develop` into it: prefer squash-merging pull requests, so `develop`
-keeps one Conventional Commit per logical change. If a merge commit is unavoidable, the default
-`Merge pull request #N from ...` message is acceptable as an exception to the `<type>: ...` format.
+Work happens on `main` as atomic commits. For larger changes, use a topic branch and
+squash-merge the pull request, so `main` keeps one Conventional Commit per logical change.
+If a merge commit is unavoidable, the default `Merge pull request #N from ...` message is
+acceptable as an exception to the `<type>: ...` format.
 
 ## Examples
 
 ```bash
 # Good
-git commit -m "feat(algorithm): add SMS-EMOA implementation"
-git commit -m "fix(operator): correct PMX crossover infinite loop on repeated genes"
-git commit -m "test(util): add tests for DistanceBasedArchive"
-git commit -m "perf(util): vectorize non-dominated sorting with numpy"
-git commit -m "docs: add hyperparameter tuning section to README"
+git commit -m "feat(rdd): add max_number example"
+git commit -m "fix(rdd): stop the Spark context when the example fails"
+git commit -m "test(rdd): add tests for max_number"
+git commit -m "perf(rdd): avoid a shuffle in count_lines_containing_word"
+git commit -m "docs: add a learning path to the README"
 git commit -m "ci: run tests on Python 3.11 and 3.12"
 
 # Bad — too broad, mixes concerns
