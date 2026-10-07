@@ -3,7 +3,7 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "spark-introduction-codes"
+name = "spark-examples"
 version = "0.1.0.dev0"
 description = "Introductory code examples for Apache Spark 4.2.0 in Python"
 requires-python = ">=3.11"
