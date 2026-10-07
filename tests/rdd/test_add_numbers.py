@@ -1,9 +1,9 @@
-"""Tests for spark_apps.rdd.add_numbers."""
+"""Tests for rdd.add_numbers."""
 
 import pytest
 from pyspark import SparkContext
 
-from spark_apps.rdd.add_numbers import add_numbers
+from rdd.add_numbers import add_numbers
 
 
 class TestAddNumbers:
