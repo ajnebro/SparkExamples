@@ -10,7 +10,10 @@ def add_numbers_counting_operations(
 
     The accumulator is a shared variable that workers can only add to, and whose value is
     read in the driver. It is updated inside an action (`reduce`), where Spark guarantees
-    that each task update is applied only once.
+    that each task update is applied only once. Updates made inside a transformation (such
+    as `map`) may be applied more than once if a task is re-executed, so use accumulators in
+    actions when exact values matter. See `closure_driver_variable` for why a plain driver
+    variable cannot be used for this purpose.
 
     Args:
         spark_context: Active Spark context.
