@@ -62,6 +62,8 @@ Spark master. Run them from the project root.
 | Example | What it shows |
 | ------- | ------------- |
 | [add_numbers.py](src/rdd/add_numbers.py) | Create an RDD with `parallelize` and sum its elements with `reduce`. |
+| [max_number.py](src/rdd/max_number.py) | Find the maximum of a list with `reduce`. |
+| [add_numbers_with_accumulator.py](src/rdd/add_numbers_with_accumulator.py) | Accumulators: count how many additions a `reduce` performs using a shared variable. |
 | [add_numbers_from_file.py](src/rdd/add_numbers_from_file.py) | Read numbers from a text file (`data/numbers.txt`), sum them and measure the computing time. |
 | [count_lines_containing_word.py](src/rdd/count_lines_containing_word.py) | Filter and count lines of a text file, reusing an RDD with `persist()` and saving results with `saveAsTextFile`. |
 | [closure_driver_variable.py](src/rdd/closure_driver_variable.py) | Closures: a driver variable is serialized and copied to the workers. |
