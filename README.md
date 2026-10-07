@@ -1,4 +1,4 @@
-# Spark Introduction Codes
+# Spark Examples
 
 A collection of introductory code examples for **Apache Spark 4.2.0**, written in
 **Python** (PySpark). They are meant as learning material, and progress from the basic RDD
