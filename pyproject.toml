@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "spark-apps"
+name = "spark-introduction-codes"
 version = "0.1.0.dev0"
-description = "Apache Spark 4.2.0 applications in Python"
+description = "Introductory code examples for Apache Spark 4.2.0 in Python"
 requires-python = ">=3.11"
 dependencies = [
     "pyspark==4.2.0",
