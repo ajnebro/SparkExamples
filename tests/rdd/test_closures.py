@@ -3,7 +3,7 @@
 import pytest
 from pyspark import SparkContext
 
-from rdd.closure_driver_variable import multiply_by_factor
+from rdd.closure_driver_variable import count_with_captured_list, multiply_by_factor
 from rdd.closure_reproducible_random import generate_reproducible_numbers
 from rdd.closure_shared_generator import generate_with_captured_generator
 
@@ -22,6 +22,14 @@ class TestMultiplyByFactor:
         result = multiply_by_factor(spark_context, data, factor)
 
         assert result == expected
+
+
+class TestCountWithCapturedList:
+    def test_should_leave_driver_list_unchanged(self, spark_context: SparkContext) -> None:
+        """Workers modify their own copy, so the driver list keeps its initial value."""
+        result = count_with_captured_list(spark_context, DATA)
+
+        assert result == [0]
 
 
 class TestCapturedGenerator:
