@@ -13,9 +13,7 @@ def add_numbers(spark_context: SparkContext, numbers: list[int]) -> int:
     Returns:
         The sum of all numbers.
     """
-    return spark_context \
-        .parallelize(numbers)\
-        .reduce(lambda a, b: a + b)
+    return spark_context.parallelize(numbers).reduce(lambda a, b: a + b)
 
 
 def main() -> None:
