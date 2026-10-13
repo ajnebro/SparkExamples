@@ -63,3 +63,14 @@ class TestExamples:
         assert "Mean age (DataFrame): 49.75" in output
         assert (output_directory / "json" / "_SUCCESS").exists()
         assert (output_directory / "csv" / "_SUCCESS").exists()
+
+    @pytest.mark.skipif(
+        not (PROJECT_ROOT / "data" / "airports.csv").exists(),
+        reason="data/airports.csv must be downloaded from https://ourairports.com/data/",
+    )
+    def test_should_run_count_airports_example(self) -> None:
+        """Given the OurAirports data file, the example prints the airports of Spain by type."""
+        output = run_example("dataframes.count_airports_by_type")
+
+        assert "large_airport" in output
+        assert "Computing time:" in output
