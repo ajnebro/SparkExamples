@@ -12,3 +12,6 @@ venv/
 .coverage
 build/
 dist/
+
+# Large data files downloaded by the user (see README.md)
+data/airports.csv
