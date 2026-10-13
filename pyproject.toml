@@ -12,6 +12,7 @@ license-files = ["LICENSE"]
 readme = "README.md"
 dependencies = [
     "pyspark==4.2.0",
+    "numpy>=2",
 ]
 
 [project.optional-dependencies]
