@@ -54,3 +54,11 @@ class TestExamples:
 
         assert "Lines containing 'Quijote':" in output
         assert (tmp_path / "out" / "_SUCCESS").exists()
+
+    def test_should_run_dataframe_basic_operations_example(self, tmp_path: Path) -> None:
+        """Given the personal data file, the example prints aggregations and writes the output."""
+        output = run_example("dataframes.basic_operations", "--output", str(tmp_path / "out"))
+
+        assert "Mean age (DataFrame): 49.75" in output
+        assert (tmp_path / "out" / "json" / "_SUCCESS").exists()
+        assert (tmp_path / "out" / "csv" / "_SUCCESS").exists()
