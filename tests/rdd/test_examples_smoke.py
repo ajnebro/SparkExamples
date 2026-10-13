@@ -74,11 +74,24 @@ class TestExamples:
             "dataframes.count_airports_by_type",
             "dataframes.count_airports_by_type_with_schema",
             "dataframes.count_airports_by_type_with_sql",
+            "dataframes.count_airports_by_type_with_parquet",
         ],
     )
     def test_should_run_count_airports_example(self, module: str) -> None:
         """Given the OurAirports data file, the example prints the airports of Spain by type."""
         output = run_example(module)
 
+        assert "type|count|" in output
         assert "large_airport" in output
-        assert "Computing time:" in output
+
+    @pytest.mark.skipif(
+        not (PROJECT_ROOT / "data" / "airports.csv").exists()
+        or not (PROJECT_ROOT / "data" / "countries.csv").exists(),
+        reason="data/airports.csv and data/countries.csv must be downloaded from OurAirports",
+    )
+    def test_should_run_count_airports_by_country_example(self) -> None:
+        """Given the airports and countries files, the example prints the top countries."""
+        output = run_example("dataframes.count_airports_by_country")
+
+        assert "United States" in output
+        assert "BroadcastHashJoin" in output
