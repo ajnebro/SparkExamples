@@ -1,15 +1,18 @@
-"""Count the airports of a country by type, reading the data from CSV and from Parquet.
+"""Count the airports of a country by type, reading the data from Parquet files.
 
-The CSV file is converted to Parquet, a columnar format, partitioned by country: there is one
-directory per country (`iso_country=ES`, `iso_country=FR`, ...). Then the same query is run on
-both formats. With Parquet, Spark only reads the columns used by the query (column pruning) and
-only the directory of the country (partition pruning), as the physical plans show. The CSV file
-must be downloaded first:
+Parquet is a columnar file format widely used with Spark. Unlike CSV, it stores the schema
+together with the data, it is compressed, and the values of each column are stored together,
+so Spark only reads the columns that a query uses.
+
+The CSV file is converted to Parquet partitioned by country: there is one directory per country
+(`iso_country=ES`, `iso_country=FR`, ...). When a query filters by country, Spark only reads the
+directory of that country. The physical plan shows both things: `ReadSchema` lists the columns
+that are read and `PartitionFilters` the partitions that are selected.
+
+The CSV file must be downloaded first:
 
     curl -o data/airports.csv https://davidmegginson.github.io/ourairports-data/airports.csv
 """
-
-import time
 
 from pyspark.sql import DataFrame, SparkSession
 
@@ -43,20 +46,6 @@ def read_airports_from_parquet(spark_session: SparkSession, directory: str) -> D
     return spark_session.read.parquet(directory)
 
 
-def run_query(airports: DataFrame, country: str) -> None:
-    """Show the airports of a country by type, the physical plan and the time of the query.
-
-    Args:
-        airports: DataFrame with the columns "iso_country" and "type".
-        country: ISO 3166-1 alpha-2 code of the country.
-    """
-    start_time = time.perf_counter()
-    result = count_airports_by_type(airports, country)
-    result.show()
-    print(f"Query time: {time.perf_counter() - start_time:.3f} s")
-    result.explain()
-
-
 def main(
     file_name: str = DEFAULT_INPUT_FILE,
     parquet_directory: str = DEFAULT_PARQUET_DIRECTORY,
@@ -76,12 +65,13 @@ def main(
     )
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
-        csv_airports = read_airports(spark_session, file_name)
-        write_airports_as_parquet(csv_airports, parquet_directory)
-        print("Query on the CSV file:")
-        run_query(csv_airports, country)
-        print("Query on the Parquet files:")
-        run_query(read_airports_from_parquet(spark_session, parquet_directory), country)
+        write_airports_as_parquet(read_airports(spark_session, file_name), parquet_directory)
+        airports = read_airports_from_parquet(spark_session, parquet_directory)
+        airports.printSchema()
+        result = count_airports_by_type(airports, country)
+        result.show()
+        # ReadSchema contains only "type", and PartitionFilters selects the country directory
+        result.explain()
     finally:
         spark_session.stop()
 
