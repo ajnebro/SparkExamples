@@ -82,7 +82,7 @@ The DataFrame examples live in [src/dataframes/](src/dataframes/); each has its 
 
 | Example | What it shows | What to observe |
 | ------- | ------------- | --------------- |
-| [basic_operations.py](src/dataframes/basic_operations.py) | Read a CSV file (`data/personalData.csv`) inferring its schema; select, add, rename and drop columns; sort; aggregate; and write the result as JSON and CSV. | The same aggregations (sum and mean) are computed with the DataFrame API and with the underlying RDD. |
+| [basic_operations.py](src/dataframes/basic_operations.py) | Read a CSV file (`data/personalData.csv`) inferring its schema; select, add, rename and drop columns; filter rows; create columns with `when`/`otherwise`; sort; aggregate; and write the result as JSON and CSV. | The same aggregations (sum and mean) are computed with the DataFrame API and with the underlying RDD. |
 
 ### Running an example
 
