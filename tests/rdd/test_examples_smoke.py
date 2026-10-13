@@ -1,5 +1,6 @@
 """Smoke tests: every example runs end to end as a separate process."""
 
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -43,22 +44,22 @@ class TestExamples:
 
         assert expected_output in output
 
-    def test_should_run_count_lines_example(self, tmp_path: Path) -> None:
-        """Given a text file, the example counts words and writes the extracted lines."""
-        output = run_example(
-            "rdd.count_lines_containing_word",
-            "data/quijote.txt",
-            "--output",
-            str(tmp_path / "out"),
-        )
+    def test_should_run_count_lines_example(self) -> None:
+        """Given Don Quijote, the example counts words and writes the extracted lines."""
+        output_directory = PROJECT_ROOT / "output" / "lines_with_word"
+        # saveAsTextFile does not overwrite, so the output of a previous run is removed
+        shutil.rmtree(output_directory, ignore_errors=True)
+
+        output = run_example("rdd.count_lines_containing_word")
 
         assert "Lines containing 'Quijote':" in output
-        assert (tmp_path / "out" / "_SUCCESS").exists()
+        assert (output_directory / "_SUCCESS").exists()
 
-    def test_should_run_dataframe_basic_operations_example(self, tmp_path: Path) -> None:
+    def test_should_run_dataframe_basic_operations_example(self) -> None:
         """Given the personal data file, the example prints aggregations and writes the output."""
-        output = run_example("dataframes.basic_operations", "--output", str(tmp_path / "out"))
+        output = run_example("dataframes.basic_operations")
 
+        output_directory = PROJECT_ROOT / "output" / "basic_operations"
         assert "Mean age (DataFrame): 49.75" in output
-        assert (tmp_path / "out" / "json" / "_SUCCESS").exists()
-        assert (tmp_path / "out" / "csv" / "_SUCCESS").exists()
+        assert (output_directory / "json" / "_SUCCESS").exists()
+        assert (output_directory / "csv" / "_SUCCESS").exists()

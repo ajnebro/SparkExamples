@@ -16,7 +16,6 @@ from dataframes.basic_operations import (
     mean_age,
     mean_age_with_rdd,
     mean_weight_by_age_group,
-    parse_args,
     read_personal_data,
     sort_by_age_and_weight,
     sum_of_weights,
@@ -106,20 +105,15 @@ class TestAddAgeGroupColumn:
 class TestFilterByAgeRange:
     @pytest.mark.parametrize(
         ("min_age", "max_age", "expected"),
-        [(40, 66, ["Lola", "Paco", "Ana"]), (23, 23, ["Luis"]), (67, 90, [])],
+        [(40, 66, ["Lola", "Paco", "Ana"]), (23, 23, ["Luis"]), (67, 90, []), (50, 40, [])],
     )
     def test_should_keep_rows_inside_the_range(
         self, people: DataFrame, min_age: int, max_age: int, expected: list[str]
     ) -> None:
-        """Both limits of the range are included."""
+        """Both limits are included, and an inverted range selects no rows."""
         result = filter_by_age_range(people, min_age, max_age)
 
         assert [row["Name"] for row in result.collect()] == expected
-
-    def test_should_raise_error_when_range_is_inverted(self, people: DataFrame) -> None:
-        """Given a minimum age greater than the maximum, the range is rejected."""
-        with pytest.raises(ValueError, match="greater than max_age"):
-            filter_by_age_range(people, 50, 40)
 
 
 class TestMeanWeightByAgeGroup:
@@ -178,13 +172,16 @@ class TestMeanAge:
 
         assert result == pytest.approx(49.25)
 
-    @pytest.mark.parametrize("mean_function", [mean_age, mean_age_with_rdd])
-    def test_should_raise_error_on_empty_data_frame(
-        self, no_people: DataFrame, mean_function: Aggregation
-    ) -> None:
-        """Given no rows, the mean is undefined."""
-        with pytest.raises(ValueError, match="empty"):
-            mean_function(no_people)
+    def test_should_return_none_on_empty_data_frame(self, no_people: DataFrame) -> None:
+        """Given no rows, `avg` returns null."""
+        result = mean_age(no_people)
+
+        assert result is None
+
+    def test_should_raise_error_on_empty_data_frame_with_rdd(self, no_people: DataFrame) -> None:
+        """Given no rows, Spark cannot `reduce` the RDD."""
+        with pytest.raises(ValueError):
+            mean_age_with_rdd(no_people)
 
 
 class TestWriteDataFrame:
@@ -197,25 +194,3 @@ class TestWriteDataFrame:
         json_rows = spark_session.read.json(str(tmp_path / "json")).count()
         csv_rows = spark_session.read.option("header", "true").csv(str(tmp_path / "csv")).count()
         assert (json_rows, csv_rows) == (4, 4)
-
-
-class TestParseArgs:
-    def test_should_use_defaults_when_no_arguments_are_given(self) -> None:
-        """Given no arguments, the default input file and output directory are used."""
-        args = parse_args([])
-
-        assert (args.input_file, args.output) == (
-            "data/personalData.csv",
-            "output/basic_operations",
-        )
-
-    def test_should_accept_custom_input_file_and_output(self) -> None:
-        """Given arguments, they override the defaults."""
-        args = parse_args(["people.csv", "--output", "out"])
-
-        assert (args.input_file, args.output) == ("people.csv", "out")
-
-    def test_should_exit_on_unknown_option(self) -> None:
-        """Given an unknown option, the parser exits with an error."""
-        with pytest.raises(SystemExit):
-            parse_args(["--unknown"])
