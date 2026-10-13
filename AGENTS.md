@@ -47,6 +47,21 @@ environment.yml      Conda environment definition
 
 Run `make check` before proposing a commit.
 
+## Focus on Spark
+
+The examples are teaching material about Spark, so they contain only the code needed to show
+the Spark concepts. Python code that is not related to Spark can hide what matters and must be
+avoided, even if it would be good practice in another context:
+
+- No command line parsing (`argparse`, `sys.argv`): the inputs are module constants used as
+  default values of the parameters of `main`.
+- No input validation that Spark already does or that is not the point of the example; let
+  Spark raise its own errors (e.g. `AnalysisException` for a missing file).
+- No auxiliary helpers (file downloads, path handling, custom logging, ...) unless the example
+  is about them.
+
+This rule takes precedence over the general guidelines below when they conflict.
+
 ## Code conventions
 
 - Annotate parameters and return types; use `|` for unions.
