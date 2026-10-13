@@ -1,0 +1,5 @@
+Name,Age,Weight,HasACar,BirthDate
+Luis,23,84.5,TRUE,2019-02-28
+Lola,42,70.2,false,2000-10-01
+Paco,66,90.1,False,1905-12-03
+Manolo,68,75.3,true,2000-01-04
