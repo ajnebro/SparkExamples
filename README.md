@@ -55,6 +55,9 @@ tests/            pytest tests (one test module per example)
 data/             Input files used by the examples
 ```
 
+The examples take no command line arguments: their inputs (file names, words, ...) are
+constants at the top of each module, so they can be changed by editing them.
+
 ## Examples
 
 The examples run on a local Spark master and must be run from the project root. They are
@@ -83,6 +86,7 @@ The DataFrame examples live in [src/dataframes/](src/dataframes/); each has its 
 | Example | What it shows | What to observe |
 | ------- | ------------- | --------------- |
 | [basic_operations.py](src/dataframes/basic_operations.py) | Read a CSV file (`data/personalData.csv`) inferring its schema; select, add, rename and drop columns; filter rows; create columns with `when`/`otherwise`; sort; aggregate; and write the result as JSON and CSV. | The same aggregations (sum and mean) are computed with the DataFrame API and with the underlying RDD. |
+| [count_airports_by_type.py](src/dataframes/count_airports_by_type.py) | Count the airports of a country (Spain by default) by type, using the [OurAirports](https://ourairports.com/data/) data (more than 80,000 rows). | A `filter`, `groupBy`, `count` and `orderBy` pipeline on a real dataset. |
 
 ### Running an example
 
@@ -90,6 +94,7 @@ The DataFrame examples live in [src/dataframes/](src/dataframes/); each has its 
 python -m rdd.add_numbers
 python -m rdd.add_numbers_from_file
 python -m dataframes.basic_operations
+python -m dataframes.count_airports_by_type
 ```
 
 Or with `spark-submit`:
@@ -98,29 +103,21 @@ Or with `spark-submit`:
 spark-submit src/rdd/max_number.py
 ```
 
-### Counting lines of a text file
+### Output directories
 
-`count_lines_containing_word.py` takes the path of a text file; use `data/quijote.txt` (the
-text of *Don Quijote*). By default it counts the lines containing "Quijote" and "Sancho", and
-writes the lines containing "Dulcinea" to the `output/lines_with_word` directory, which
-Spark refuses to overwrite if it already exists (`make clean` removes it):
+`count_lines_containing_word.py` writes the lines containing "Dulcinea" to the
+`output/lines_with_word` directory, which Spark refuses to overwrite if it already exists
+(`make clean` removes it). `basic_operations.py` writes the data in JSON and CSV formats to
+`output/basic_operations`, replacing any previous output.
 
-```bash
-python -m rdd.count_lines_containing_word data/quijote.txt
-python -m rdd.count_lines_containing_word data/quijote.txt \
-    --count-words molino gigante --extract-word Rocinante --output output/rocinante
-```
+### Downloading the airports data
 
-### DataFrame basic operations
-
-`basic_operations.py` reads `data/personalData.csv` by default; another CSV file with the
-same columns (`Name`, `Age`, `Weight`, `HasACar`, `BirthDate`) can be given as an argument.
-It writes the data to the `json` and `csv` subdirectories of `output/basic_operations`,
-replacing any previous output:
+`count_airports_by_type.py` reads `data/airports.csv`, which is not included in the repository
+because it is large and updated daily. Spark cannot read a CSV file directly from an HTTP(S)
+URL, so download it first:
 
 ```bash
-python -m dataframes.basic_operations
-python -m dataframes.basic_operations data/personalData.csv --output output/people
+curl -o data/airports.csv https://davidmegginson.github.io/ourairports-data/airports.csv
 ```
 
 ## Development
@@ -137,7 +134,8 @@ python -m dataframes.basic_operations data/personalData.csv --output output/peop
 Tests use a local, session-scoped `SparkContext`, and a `SparkSession` built on it, defined in
 [tests/conftest.py](tests/conftest.py). The smoke tests in
 [tests/rdd/test_examples_smoke.py](tests/rdd/test_examples_smoke.py) run every example as a
-separate process.
+separate process; the airports example is skipped if `data/airports.csv` has not been
+downloaded.
 
 ## Contributing
 
