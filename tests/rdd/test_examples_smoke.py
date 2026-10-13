@@ -68,9 +68,17 @@ class TestExamples:
         not (PROJECT_ROOT / "data" / "airports.csv").exists(),
         reason="data/airports.csv must be downloaded from https://ourairports.com/data/",
     )
-    def test_should_run_count_airports_example(self) -> None:
+    @pytest.mark.parametrize(
+        "module",
+        [
+            "dataframes.count_airports_by_type",
+            "dataframes.count_airports_by_type_with_schema",
+            "dataframes.count_airports_by_type_with_sql",
+        ],
+    )
+    def test_should_run_count_airports_example(self, module: str) -> None:
         """Given the OurAirports data file, the example prints the airports of Spain by type."""
-        output = run_example("dataframes.count_airports_by_type")
+        output = run_example(module)
 
         assert "large_airport" in output
         assert "Computing time:" in output
