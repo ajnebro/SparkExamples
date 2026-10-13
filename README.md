@@ -89,6 +89,8 @@ The DataFrame examples live in [src/dataframes/](src/dataframes/); each has its 
 | [count_airports_by_type.py](src/dataframes/count_airports_by_type.py) | Count the airports of a country (Spain by default) by type, using the [OurAirports](https://ourairports.com/data/) data (more than 80,000 rows). | A `filter`, `groupBy`, `count` and `orderBy` pipeline on a real dataset. |
 | [count_airports_by_type_with_schema.py](src/dataframes/count_airports_by_type_with_schema.py) | The same count, reading the CSV file with an explicit schema (`StructType`) instead of inferring it. | The file is read only once, and `enforceSchema=false` makes Spark fail if the header does not match the schema instead of silently shifting the columns. |
 | [count_airports_by_type_with_sql.py](src/dataframes/count_airports_by_type_with_sql.py) | The same count as a Spark SQL query over a temporary view, with a named parameter (`:country`). | SQL and the DataFrame API produce the same result. |
+| [count_airports_by_type_with_parquet.py](src/dataframes/count_airports_by_type_with_parquet.py) | Convert the CSV file to Parquet partitioned by country (`partitionBy`), and run the same count on both formats. | The physical plans (`explain()`): with Parquet, Spark reads only the `type` column (column pruning) and only the `iso_country=ES` directory (partition pruning). |
+| [count_airports_by_country.py](src/dataframes/count_airports_by_country.py) | Join the airports with the countries (`data/countries.csv`) to get the countries with the most airports. | The small countries table is broadcast: the plan shows a `BroadcastHashJoin` instead of a `SortMergeJoin`. |
 
 ### Running an example
 
@@ -99,6 +101,8 @@ python -m dataframes.basic_operations
 python -m dataframes.count_airports_by_type
 python -m dataframes.count_airports_by_type_with_schema
 python -m dataframes.count_airports_by_type_with_sql
+python -m dataframes.count_airports_by_type_with_parquet
+python -m dataframes.count_airports_by_country
 ```
 
 Or with `spark-submit`:
@@ -112,16 +116,19 @@ spark-submit src/rdd/max_number.py
 `count_lines_containing_word.py` writes the lines containing "Dulcinea" to the
 `output/lines_with_word` directory, which Spark refuses to overwrite if it already exists
 (`make clean` removes it). `basic_operations.py` writes the data in JSON and CSV formats to
-`output/basic_operations`, replacing any previous output.
+`output/basic_operations`, replacing any previous output, and
+`count_airports_by_type_with_parquet.py` writes the airports in Parquet format to
+`output/airports_parquet`, also replacing any previous output.
 
 ### Downloading the airports data
 
-The airports examples read `data/airports.csv`, which is not included in the repository
-because it is large and updated daily. Spark cannot read a CSV file directly from an HTTP(S)
-URL, so download it first:
+The airports examples read `data/airports.csv` (and `count_airports_by_country.py` also reads
+`data/countries.csv`). They are not included in the repository because they are updated daily.
+Spark cannot read a CSV file directly from an HTTP(S) URL, so download them first:
 
 ```bash
 curl -o data/airports.csv https://davidmegginson.github.io/ourairports-data/airports.csv
+curl -o data/countries.csv https://davidmegginson.github.io/ourairports-data/countries.csv
 ```
 
 ## Development
@@ -138,7 +145,7 @@ curl -o data/airports.csv https://davidmegginson.github.io/ourairports-data/airp
 Tests use a local, session-scoped `SparkContext`, and a `SparkSession` built on it, defined in
 [tests/conftest.py](tests/conftest.py). The smoke tests in
 [tests/rdd/test_examples_smoke.py](tests/rdd/test_examples_smoke.py) run every example as a
-separate process; the airports example is skipped if `data/airports.csv` has not been
+separate process; the airports examples are skipped if their data files have not been
 downloaded.
 
 ## Contributing
