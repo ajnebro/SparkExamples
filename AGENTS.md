@@ -24,7 +24,7 @@ must be written in **English**.
 
 ```text
 src/rdd/             Examples based on the RDD API (top-level package `rdd`)
-src/dataframes/      Planned: examples based on the DataFrame API
+src/dataframes/      Examples based on the DataFrame API (top-level package `dataframes`)
 tests/               pytest tests, mirroring the layout of src/
 data/                Input files used by the examples (`output/` is git-ignored)
 pyproject.toml       Package metadata, dependencies, ruff and pytest configuration
@@ -73,8 +73,9 @@ Run `make check` before proposing a commit.
 - Name tests `test_should_<behavior>`; group related tests in `class Test<Subject>:`.
 - Use `@pytest.mark.parametrize` for scenario variants and `pytest.raises` for errors.
 - Cover both success and failure paths.
-- Use the shared session-scoped `spark_context` fixture from
-  [tests/conftest.py](tests/conftest.py); do not create a new context per test.
+- Use the shared session-scoped fixtures from [tests/conftest.py](tests/conftest.py):
+  `spark_context` for RDD tests and `spark_session` (built on the same context) for DataFrame
+  tests. Do not create a new context or session per test.
 - Every example also has a smoke test in `tests/rdd/test_examples_smoke.py` (marker `smoke`)
   that runs it as a separate process; register new examples there.
 

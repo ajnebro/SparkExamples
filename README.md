@@ -49,16 +49,20 @@ run `pip install pyspark==4.2.0`.
 ## Project structure
 
 ```text
-src/rdd/       Examples based on the RDD API
-tests/         pytest tests (one test module per example)
-data/          Input files used by the examples
+src/rdd/          Examples based on the RDD API
+src/dataframes/   Examples based on the DataFrame API
+tests/            pytest tests (one test module per example)
+data/             Input files used by the examples
 ```
 
 ## Examples
 
-All the examples live in [src/rdd/](src/rdd/) and run on a local Spark master. Run them from
-the project root. They are listed in the suggested order of study; each has its tests in
-[tests/rdd/](tests/rdd/).
+The examples run on a local Spark master and must be run from the project root. They are
+listed in the suggested order of study: first the RDD API, then the DataFrame API.
+
+### RDD API
+
+The RDD examples live in [src/rdd/](src/rdd/); each has its tests in [tests/rdd/](tests/rdd/).
 
 | Example | What it shows | What to observe |
 | ------- | ------------- | --------------- |
@@ -71,11 +75,21 @@ the project root. They are listed in the suggested order of study; each has its 
 | [closure_reproducible_random.py](src/rdd/closure_reproducible_random.py) | Closures fix: reproducible results independent of the data distribution. | The result does not change with the number of partitions. |
 | [add_numbers_with_accumulator.py](src/rdd/add_numbers_with_accumulator.py) | Accumulators: count how many additions a `reduce` performs using a shared variable. | Accumulators are the right tool to send values from the workers to the driver. |
 
+### DataFrame API
+
+The DataFrame examples live in [src/dataframes/](src/dataframes/); each has its tests in
+[tests/dataframes/](tests/dataframes/).
+
+| Example | What it shows | What to observe |
+| ------- | ------------- | --------------- |
+| [basic_operations.py](src/dataframes/basic_operations.py) | Read a CSV file (`data/personalData.csv`) inferring its schema; select, add, rename and drop columns; sort; aggregate; and write the result as JSON and CSV. | The same aggregations (sum and mean) are computed with the DataFrame API and with the underlying RDD. |
+
 ### Running an example
 
 ```bash
 python -m rdd.add_numbers
 python -m rdd.add_numbers_from_file
+python -m dataframes.basic_operations
 ```
 
 Or with `spark-submit`:
@@ -97,6 +111,18 @@ python -m rdd.count_lines_containing_word data/quijote.txt \
     --count-words molino gigante --extract-word Rocinante --output output/rocinante
 ```
 
+### DataFrame basic operations
+
+`basic_operations.py` reads `data/personalData.csv` by default; another CSV file with the
+same columns (`Name`, `Age`, `Weight`, `HasACar`, `BirthDate`) can be given as an argument.
+It writes the data to the `json` and `csv` subdirectories of `output/basic_operations`,
+replacing any previous output:
+
+```bash
+python -m dataframes.basic_operations
+python -m dataframes.basic_operations data/personalData.csv --output output/people
+```
+
 ## Development
 
 | Task | Command |
@@ -108,7 +134,7 @@ python -m rdd.count_lines_containing_word data/quijote.txt \
 | Lint, format check and tests | `make check` |
 | Remove generated files | `make clean` |
 
-Tests use a local, session-scoped `SparkContext` defined in
+Tests use a local, session-scoped `SparkContext`, and a `SparkSession` built on it, defined in
 [tests/conftest.py](tests/conftest.py). The smoke tests in
 [tests/rdd/test_examples_smoke.py](tests/rdd/test_examples_smoke.py) run every example as a
 separate process.
