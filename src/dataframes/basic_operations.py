@@ -7,9 +7,6 @@ The input file has a header and one row per person, e.g.:
     Lola,42,70.2,false,2000-10-01
 """
 
-import argparse
-from collections.abc import Sequence
-
 from pyspark.sql import DataFrame, SparkSession, functions
 
 DEFAULT_INPUT_FILE = "data/personalData.csv"
@@ -79,13 +76,8 @@ def filter_by_age_range(data_frame: DataFrame, min_age: int, max_age: int) -> Da
         max_age: Maximum age.
 
     Returns:
-        The DataFrame with the rows inside the range.
-
-    Raises:
-        ValueError: If min_age is greater than max_age.
+        The DataFrame with the rows inside the range (none if min_age > max_age).
     """
-    if min_age > max_age:
-        raise ValueError(f"min_age ({min_age}) is greater than max_age ({max_age})")
     return data_frame.filter(functions.col("Age").between(min_age, max_age))
 
 
@@ -158,20 +150,15 @@ def sum_of_weights_with_rdd(data_frame: DataFrame) -> float:
     return data_frame.rdd.map(lambda row: row["Weight"]).fold(0.0, lambda a, b: a + b)
 
 
-def mean_age(data_frame: DataFrame) -> float:
+def mean_age(data_frame: DataFrame) -> float | None:
     """Compute the mean age using the DataFrame API.
 
     Args:
         data_frame: DataFrame with an "Age" column.
 
     Returns:
-        The mean age.
-
-    Raises:
-        ValueError: If the DataFrame is empty.
+        The mean age, or None if the DataFrame is empty (`avg` of no values is null).
     """
-    if data_frame.isEmpty():
-        raise ValueError("Cannot compute the mean age of an empty DataFrame")
     return data_frame.agg(functions.avg("Age")).first()[0]
 
 
@@ -185,10 +172,8 @@ def mean_age_with_rdd(data_frame: DataFrame) -> float:
         The mean age.
 
     Raises:
-        ValueError: If the DataFrame is empty.
+        ValueError: If the DataFrame is empty (Spark cannot `reduce` an empty RDD).
     """
-    if data_frame.isEmpty():
-        raise ValueError("Cannot compute the mean age of an empty DataFrame")
     ages = data_frame.rdd.map(lambda row: row["Age"])
     return ages.reduce(lambda a, b: a + b) / ages.count()
 
@@ -277,41 +262,28 @@ def write_data_frame(data_frame: DataFrame, output_directory: str) -> None:
     data_frame.write.mode("overwrite").option("header", "true").csv(f"{output_directory}/csv")
 
 
-def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
-    """Parse the command line arguments.
-
-    Args:
-        argv: Arguments to parse. `sys.argv[1:]` is used if None.
-
-    Returns:
-        The parsed arguments.
-    """
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("input_file", nargs="?", default=DEFAULT_INPUT_FILE)
-    parser.add_argument("--output", default=DEFAULT_OUTPUT_DIRECTORY)
-    return parser.parse_args(argv)
-
-
-def main(argv: Sequence[str] | None = None) -> None:
+def main(
+    file_name: str = DEFAULT_INPUT_FILE, output_directory: str = DEFAULT_OUTPUT_DIRECTORY
+) -> None:
     """Run the example.
 
     Args:
-        argv: Command line arguments. `sys.argv[1:]` is used if None.
+        file_name: Path of the CSV file with the personal data.
+        output_directory: Directory where the data is written in JSON and CSV formats.
     """
-    args = parse_args(argv)
     spark_session = (
         SparkSession.builder.appName("DataFrameBasicOperations").master("local[*]").getOrCreate()
     )
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         # The DataFrame is used by many actions, so it is kept in memory
-        data_frame = read_personal_data(spark_session, args.input_file).persist()
+        data_frame = read_personal_data(spark_session, file_name).persist()
         show_inspection(data_frame)
         show_column_operations(data_frame)
         show_filtering(data_frame)
         show_sorting(data_frame)
         show_aggregations(data_frame)
-        write_data_frame(data_frame, args.output)
+        write_data_frame(data_frame, output_directory)
     finally:
         spark_session.stop()
 
