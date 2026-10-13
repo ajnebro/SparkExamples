@@ -12,6 +12,7 @@ venv/
 .coverage
 build/
 dist/
+.DS_Store
 
 # Large data files downloaded by the user (see README.md)
 data/airports.csv
