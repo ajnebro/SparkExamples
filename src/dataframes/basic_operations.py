@@ -15,6 +15,7 @@ from pyspark.sql import DataFrame, SparkSession, functions
 DEFAULT_INPUT_FILE = "data/personalData.csv"
 DEFAULT_OUTPUT_DIRECTORY = "output/basic_operations"
 SENIOR_AGE = 45
+ADULT_AGE = 30
 
 
 def read_personal_data(spark_session: SparkSession, file_name: str) -> DataFrame:
@@ -46,6 +47,66 @@ def add_senior_column(data_frame: DataFrame, age_threshold: int = SENIOR_AGE) ->
         The DataFrame with the new column.
     """
     return data_frame.withColumn("Senior", functions.col("Age") > age_threshold)
+
+
+def add_age_group_column(data_frame: DataFrame) -> DataFrame:
+    """Add a column "AgeGroup" with the values "young", "adult" or "senior".
+
+    A person is young below ADULT_AGE, senior above SENIOR_AGE, and adult otherwise. As there
+    is no `otherwise` clause, a null age produces a null group.
+
+    Args:
+        data_frame: DataFrame with an "Age" column.
+
+    Returns:
+        The DataFrame with the new column.
+    """
+    age = functions.col("Age")
+    age_group = (
+        functions.when(age < ADULT_AGE, "young")
+        .when(age <= SENIOR_AGE, "adult")
+        .when(age > SENIOR_AGE, "senior")
+    )
+    return data_frame.withColumn("AgeGroup", age_group)
+
+
+def filter_by_age_range(data_frame: DataFrame, min_age: int, max_age: int) -> DataFrame:
+    """Keep the rows whose age is between two values, both included.
+
+    Args:
+        data_frame: DataFrame with an "Age" column.
+        min_age: Minimum age.
+        max_age: Maximum age.
+
+    Returns:
+        The DataFrame with the rows inside the range.
+
+    Raises:
+        ValueError: If min_age is greater than max_age.
+    """
+    if min_age > max_age:
+        raise ValueError(f"min_age ({min_age}) is greater than max_age ({max_age})")
+    return data_frame.filter(functions.col("Age").between(min_age, max_age))
+
+
+def mean_weight_by_age_group(data_frame: DataFrame) -> DataFrame:
+    """Compute the number of people and their mean weight for each age group.
+
+    Args:
+        data_frame: DataFrame with "Age" and "Weight" columns.
+
+    Returns:
+        A DataFrame with the columns "AgeGroup", "People" and "MeanWeight", sorted by group.
+    """
+    return (
+        add_age_group_column(data_frame)
+        .groupBy("AgeGroup")
+        .agg(
+            functions.count("*").alias("People"),
+            functions.round(functions.avg("Weight"), 2).alias("MeanWeight"),
+        )
+        .orderBy("AgeGroup")
+    )
 
 
 def sort_by_age_and_weight(data_frame: DataFrame) -> DataFrame:
@@ -156,8 +217,24 @@ def show_column_operations(data_frame: DataFrame) -> None:
     data_frame.select("Name", functions.length("Name") > 4).show()
     data_frame.select("Name", functions.col("Name").startswith("L")).show()
     add_senior_column(data_frame).show()
+    add_age_group_column(data_frame).show()
     data_frame.withColumnRenamed("HasACar", "Owner").show()
     data_frame.drop("BirthDate").show()
+
+
+def show_filtering(data_frame: DataFrame) -> None:
+    """Print the rows selected with several kinds of filter conditions.
+
+    Args:
+        data_frame: DataFrame with the personal data.
+    """
+    data_frame.filter(functions.col("Age") > SENIOR_AGE).show()
+    # `where` is an alias of `filter`, and it also accepts a SQL expression
+    data_frame.where(f"Age > {SENIOR_AGE} AND HasACar").show()
+    # Combined conditions: each one goes in parentheses, using & (and), | (or) and ~ (not)
+    data_frame.filter((functions.col("Weight") > 80) | ~functions.col("HasACar")).show()
+    data_frame.filter(functions.col("Name").isin("Luis", "Lola")).show()
+    filter_by_age_range(data_frame, 40, 66).show()
 
 
 def show_sorting(data_frame: DataFrame) -> None:
@@ -186,6 +263,7 @@ def show_aggregations(data_frame: DataFrame) -> None:
     print(f"Mean age (DataFrame): {mean_age(data_frame)}")
     data_frame.select(functions.avg("Age").alias("Average")).show()
     count_by_car_ownership(data_frame).show()
+    mean_weight_by_age_group(data_frame).show()
 
 
 def write_data_frame(data_frame: DataFrame, output_directory: str) -> None:
@@ -230,6 +308,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         data_frame = read_personal_data(spark_session, args.input_file).persist()
         show_inspection(data_frame)
         show_column_operations(data_frame)
+        show_filtering(data_frame)
         show_sorting(data_frame)
         show_aggregations(data_frame)
         write_data_frame(data_frame, args.output)
