@@ -9,10 +9,13 @@ from pyspark.errors import AnalysisException
 from pyspark.sql import DataFrame, SparkSession
 
 from dataframes.basic_operations import (
+    add_age_group_column,
     add_senior_column,
     count_by_car_ownership,
+    filter_by_age_range,
     mean_age,
     mean_age_with_rdd,
+    mean_weight_by_age_group,
     parse_args,
     read_personal_data,
     sort_by_age_and_weight,
@@ -82,6 +85,53 @@ class TestAddSeniorColumn:
         result = add_senior_column(people, age_threshold)
 
         assert [row["Senior"] for row in result.collect()] == expected
+
+
+class TestAddAgeGroupColumn:
+    @pytest.mark.parametrize(
+        ("age", "expected"),
+        [(29, "young"), (30, "adult"), (45, "adult"), (46, "senior"), (None, None)],
+    )
+    def test_should_assign_the_group_of_each_age(
+        self, spark_session: SparkSession, age: int | None, expected: str | None
+    ) -> None:
+        """The limits of each group are included as documented, and a null age has no group."""
+        data_frame = spark_session.createDataFrame([("X", age, 70.0, True)], SCHEMA)
+
+        result = add_age_group_column(data_frame).first()["AgeGroup"]
+
+        assert result == expected
+
+
+class TestFilterByAgeRange:
+    @pytest.mark.parametrize(
+        ("min_age", "max_age", "expected"),
+        [(40, 66, ["Lola", "Paco", "Ana"]), (23, 23, ["Luis"]), (67, 90, [])],
+    )
+    def test_should_keep_rows_inside_the_range(
+        self, people: DataFrame, min_age: int, max_age: int, expected: list[str]
+    ) -> None:
+        """Both limits of the range are included."""
+        result = filter_by_age_range(people, min_age, max_age)
+
+        assert [row["Name"] for row in result.collect()] == expected
+
+    def test_should_raise_error_when_range_is_inverted(self, people: DataFrame) -> None:
+        """Given a minimum age greater than the maximum, the range is rejected."""
+        with pytest.raises(ValueError, match="greater than max_age"):
+            filter_by_age_range(people, 50, 40)
+
+
+class TestMeanWeightByAgeGroup:
+    def test_should_count_people_and_average_weight_per_group(self, people: DataFrame) -> None:
+        """Each group has its number of people and its mean weight rounded to two decimals."""
+        result = mean_weight_by_age_group(people)
+
+        assert [tuple(row) for row in result.collect()] == [
+            ("adult", 1, 70.2),
+            ("senior", 2, 75.05),
+            ("young", 1, 84.5),
+        ]
 
 
 class TestSortByAgeAndWeight:
