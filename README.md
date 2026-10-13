@@ -87,6 +87,8 @@ The DataFrame examples live in [src/dataframes/](src/dataframes/); each has its 
 | ------- | ------------- | --------------- |
 | [basic_operations.py](src/dataframes/basic_operations.py) | Read a CSV file (`data/personalData.csv`) inferring its schema; select, add, rename and drop columns; filter rows; create columns with `when`/`otherwise`; sort; aggregate; and write the result as JSON and CSV. | The same aggregations (sum and mean) are computed with the DataFrame API and with the underlying RDD. |
 | [count_airports_by_type.py](src/dataframes/count_airports_by_type.py) | Count the airports of a country (Spain by default) by type, using the [OurAirports](https://ourairports.com/data/) data (more than 80,000 rows). | A `filter`, `groupBy`, `count` and `orderBy` pipeline on a real dataset. |
+| [count_airports_by_type_with_schema.py](src/dataframes/count_airports_by_type_with_schema.py) | The same count, reading the CSV file with an explicit schema (`StructType`) instead of inferring it. | The file is read only once, and `enforceSchema=false` makes Spark fail if the header does not match the schema instead of silently shifting the columns. |
+| [count_airports_by_type_with_sql.py](src/dataframes/count_airports_by_type_with_sql.py) | The same count as a Spark SQL query over a temporary view, with a named parameter (`:country`). | SQL and the DataFrame API produce the same result. |
 
 ### Running an example
 
@@ -95,6 +97,8 @@ python -m rdd.add_numbers
 python -m rdd.add_numbers_from_file
 python -m dataframes.basic_operations
 python -m dataframes.count_airports_by_type
+python -m dataframes.count_airports_by_type_with_schema
+python -m dataframes.count_airports_by_type_with_sql
 ```
 
 Or with `spark-submit`:
@@ -112,7 +116,7 @@ spark-submit src/rdd/max_number.py
 
 ### Downloading the airports data
 
-`count_airports_by_type.py` reads `data/airports.csv`, which is not included in the repository
+The airports examples read `data/airports.csv`, which is not included in the repository
 because it is large and updated daily. Spark cannot read a CSV file directly from an HTTP(S)
 URL, so download it first:
 
