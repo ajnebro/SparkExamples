@@ -6,4 +6,4 @@ dependencies:
   - openjdk=21
   - pip
   - pip:
-      - -e .[dev]
+      - -e .[dev,notebooks]
