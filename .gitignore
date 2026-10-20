@@ -19,3 +19,6 @@ data/airports.csv
 data/countries.csv
 data/Crimes_*
 data/crimes.zip
+
+# Personal code shared locally, not part of the repository
+src/local/
