@@ -4,17 +4,24 @@ A collection of introductory code examples for **Apache Spark 4.2.0**, written i
 **Python** (PySpark). They are meant as learning material, and progress from the basic RDD
 API towards more advanced topics.
 
-> **AI-assisted project.** This project is used for teaching, and it is developed with the assistance of AI coding agents (such as [Claude Code](https://claude.com/claude-code)). To keep that work consistent and transparent, the repository
-> includes the instructions that the agents must follow:
->
-> - [AGENTS.md](AGENTS.md): guidance shared by all the agents ([CLAUDE.md](CLAUDE.md) points
->   to it for Claude Code).
-> - [CODING_GUIDELINES.md](CODING_GUIDELINES.md): style and testing rules for the code.
-> - [GIT_GUIDELINES.md](GIT_GUIDELINES.md): rules for commits and branches.
->
-> The commits made with an agent are marked with a `Co-Authored-By` trailer. As with any
-> other source, check what you learn from the examples against the
-> [Spark documentation](https://spark.apache.org/docs/latest/).
+## AI-assisted development
+
+This project is used for teaching. Its code derives from the original code written by the
+project authors, and it has been developed with the assistance of AI agents (such as
+[Claude Code](https://claude.com/claude-code)). The agents are used for code review,
+documentation, bug finding, proposals for improvements, refactoring to follow the style
+guidelines, and the addition of unit tests. The authors review and decide which changes are
+accepted. To keep the work of the agents consistent and transparent, the repository includes
+the instructions that they must follow:
+
+- [AGENTS.md](AGENTS.md): guidance shared by all the agents ([CLAUDE.md](CLAUDE.md) points to
+  it for Claude Code).
+- [CODING_GUIDELINES.md](CODING_GUIDELINES.md): style and testing rules for the code.
+- [GIT_GUIDELINES.md](GIT_GUIDELINES.md): rules for commits and branches.
+
+The commits made with an AI agent are marked with a `Co-Authored-By` trailer. As with any other
+source, check what you learn from the examples against the
+[Spark documentation](https://spark.apache.org/docs/latest/).
 
 ## Requirements
 
