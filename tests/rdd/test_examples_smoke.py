@@ -137,6 +137,35 @@ class TestExamples:
         assert "average_temperature" in completed.stdout
         assert "21.0" in completed.stdout
 
+    def test_should_run_streaming_average_and_max_temperature_example(self) -> None:
+        """Given the files of a sensor, the streaming query prints the average and the maximum."""
+        directory = PROJECT_ROOT / "output" / "streaming"
+        shutil.rmtree(directory, ignore_errors=True)
+        directory.mkdir(parents=True)
+        for temperature in (9.5, 30.0, 12.5):
+            write_reading(directory, temperature)
+
+        try:
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "-c",
+                    "from streaming.streaming_average_and_max_temperature import main;"
+                    " main(seconds=20)",
+                ],
+                cwd=PROJECT_ROOT,
+                capture_output=True,
+                text=True,
+                timeout=120,
+                check=True,
+            )
+        finally:
+            shutil.rmtree(directory, ignore_errors=True)
+
+        assert "max_temperature" in completed.stdout
+        assert "30.0" in completed.stdout
+        assert "17.333" in completed.stdout
+
     def test_should_run_streaming_find_high_temperature_example(self) -> None:
         """Given the files of a sensor, the streaming query prints the high temperatures."""
         directory = PROJECT_ROOT / "output" / "streaming"
