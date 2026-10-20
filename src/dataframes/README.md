@@ -12,6 +12,7 @@ Examples based on the DataFrame API. Each has its tests in
 | [count_airports_by_type_with_sql.py](count_airports_by_type_with_sql.py) | The same count as a Spark SQL query over a temporary view, with a named parameter (`:country`). | SQL and the DataFrame API produce the same result. |
 | [count_airports_by_type_with_parquet.py](count_airports_by_type_with_parquet.py) | Convert the CSV file to Parquet, a columnar format that stores the schema with the data, partitioned by country (`partitionBy`), and run the same count on it. | The physical plan (`explain()`): Spark reads only the `type` column and only the `iso_country=ES` directory. |
 | [count_airports_by_country.py](count_airports_by_country.py) | Join the airports with the countries (`data/countries.csv`) to get the countries with the most airports. | The small countries table is broadcast: the plan shows a `BroadcastHashJoin` instead of a `SortMergeJoin`. |
+| [word_count_with_dataframe.py](word_count_with_dataframe.py) | The word count of `data/quijote.txt` with the DataFrame API: `regexp_extract_all` and `explode` to get the words, `groupBy`, `count` and `orderBy`. It is the version of [rdd/word_count.py](../rdd/word_count.py) with DataFrames. | Both examples print exactly the same words and counts (a test checks it), so their code and their computing times can be compared. `groupBy` shuffles the data in `spark.sql.shuffle.partitions` partitions, 200 by default: the example sets 4, which is enough for a book (see the docstring of the module). |
 
 ## Output directories
 
