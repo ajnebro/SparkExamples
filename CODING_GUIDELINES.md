@@ -44,18 +44,26 @@ write each call on its own line, starting with the dot and aligned with the othe
 parentheses:
 
 ```python
-# fmt: off
-word_counts = (
-    words
-    .groupBy("word")
-    .count()
-    .orderBy(functions.desc("count"), "word")
-)
-# fmt: on
+    words = extract_words(lines)
+
+    # fmt: off
+    word_counts = (
+        words
+        .groupBy("word")
+        .count()
+        .orderBy(functions.desc("count"), "word")
+    )
+    # fmt: on
+
+    print_top(word_counts)
 ```
 
 - `ruff format` joins short chains into one line, so the statement is wrapped in
   `# fmt: off` / `# fmt: on` to keep the layout. `make format-check` still passes.
+- A blank line separates the block from the neighbouring statements, so that the Spark code
+  stands out. A comment that explains the block goes right above `# fmt: off`, after the blank
+  line. No blank line is added when the block is the first or the last statement of a body (just
+  after the docstring, after `try:` or before leaving the function).
 - Exceptions, kept on one line: a single call followed by a final action
   (`data_frame.select("Name").show()`, `spark_context.parallelize(numbers).reduce(add)`), and
   column expressions (`functions.col("Age").desc()`).
