@@ -39,6 +39,7 @@ class TestExamples:
             ("rdd.add_numbers_with_accumulator", "The number of reduce operations is 7"),
             ("rdd.max_number", "The maximum is 8"),
             ("rdd.word_count", "que: "),
+            ("dataframes.word_count_with_dataframe", "que: "),
             ("rdd.closure_driver_variable", "[10, 20, 30, 40]"),
             ("rdd.closure_shared_generator", "Generated numbers:"),
             ("rdd.closure_reproducible_random", "Generated reproducible numbers:"),
