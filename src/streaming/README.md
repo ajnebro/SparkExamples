@@ -14,3 +14,59 @@ Examples based on Spark Structured Streaming. They must be run from the project 
 | [streaming_average_temperature_from_several_sensors.py](streaming_average_temperature_from_several_sensors.py) | Read as a stream the CSV files of several sensors (`<sensor>,<temperature>,<time stamp>`, written by `temperature_sensor_with_timestamp_generator.py`) with an explicit schema, and compute the average and maximum temperature of each sensor with `groupBy`. Run one or more generators first, in other terminals. | A streaming source needs its schema to be given. With the `update` mode only the sensors whose statistics have changed in the micro-batch are printed. The time stamp column of the files is not used, so it is left out of the schema and Spark ignores it. |
 | [streaming_average_temperature_with_time_windows.py](streaming_average_temperature_with_time_windows.py) | Group the temperatures of several sensors (CSV files written by `temperature_sensor_with_timestamp_generator.py`) in sliding time windows of 20 seconds every 10 seconds, with `window`, and compute the average of each sensor in each window. Run one or more generators first, in other terminals. | The windows use the time stamp written in the data (event time), not the time of arrival. As they overlap, each temperature appears in two windows. Sorting a streaming aggregation requires the `complete` mode, so the whole result is printed after every micro-batch. |
 | [streaming_word_count_from_files.py](streaming_word_count_from_files.py) | Read the text files of a directory as a stream and count how many times each word appears, normalizing the text (lower case, split by anything that is not a letter or a digit) and sorting by frequency. There is no generator: copy text files (e.g. `cp data/quijote.txt output/streaming/`) while it runs. | The counts cover all the files received since the query started. Sorting needs the `complete` mode. A `groupBy` shuffles the data in `spark.sql.shuffle.partitions` partitions, 200 by default: the example sets 4, because 200 tasks per micro-batch are far too many for so little data (see the docstring of the module for the details). |
+
+## How to run the examples
+
+Every example needs a data source writing into `output/streaming` and a Spark program reading
+it. Use one terminal per process, always from the project root, and stop each process with
+Ctrl+C. Run `make clean` between experiments: the files left by a previous run are processed
+again.
+
+### One sensor
+
+```bash
+# Terminal 1: a sensor that writes a temperature every 5 seconds
+python -m streaming.temperature_sensor_generator
+
+# Terminal 2: any of the examples that read a single sensor
+python -m streaming.streaming_average_temperature
+python -m streaming.streaming_average_and_max_temperature
+python -m streaming.streaming_find_high_temperature
+```
+
+### Several sensors, with a time stamp
+
+The generator takes the directory and the name of the sensor. The directory must be the one the
+examples read (`output/streaming`):
+
+```bash
+# Terminals 1 and 2: two sensors, one reading every 5 seconds
+python -m streaming.temperature_sensor_with_timestamp_generator output/streaming sensor1
+python -m streaming.temperature_sensor_with_timestamp_generator output/streaming sensor2 --seconds 3
+
+# Terminal 3: average and maximum temperature of each sensor
+python -m streaming.streaming_average_temperature_from_several_sensors
+
+# or, instead, the average in sliding windows (the first result appears after a few seconds)
+python -m streaming.streaming_average_temperature_with_time_windows
+```
+
+Use `--readings N` to make a sensor stop after `N` readings.
+
+### Word count
+
+There is no generator: start the program and copy text files into the directory while it runs.
+
+```bash
+# Terminal 1
+python -m streaming.streaming_word_count_from_files
+
+# Terminal 2
+cp data/quijote.txt output/streaming/
+```
+
+### Downloading a file periodically
+
+```bash
+python -m streaming.fetch_file_by_interval <url> output/streaming 10 --downloads 5
+```
