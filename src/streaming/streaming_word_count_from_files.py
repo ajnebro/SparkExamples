@@ -69,6 +69,7 @@ def count_words(lines: DataFrame) -> DataFrame:
             "word"
         )
     )
+
     # fmt: off
     return (
         words
@@ -97,10 +98,12 @@ def main(directory: str = DEFAULT_STREAMING_DIRECTORY, seconds: float | None = N
         .getOrCreate()
     )
     # fmt: on
+
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         lines = read_lines(spark_session, directory)
         lines.printSchema()
+
         # Sorting a streaming aggregation is only allowed in the "complete" mode
         # fmt: off
         query = (
@@ -110,6 +113,7 @@ def main(directory: str = DEFAULT_STREAMING_DIRECTORY, seconds: float | None = N
             .start()
         )
         # fmt: on
+
         query.awaitTermination(seconds)
         query.stop()
     finally:

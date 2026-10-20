@@ -52,6 +52,7 @@ def count_words(lines: DataFrame, stop_words: list[str]) -> DataFrame:
     remover = StopWordsRemover(
         inputCol="words", outputCol="filtered", stopWords=stop_words, locale="es"
     )
+
     # fmt: off
     return (
         remover
@@ -81,10 +82,12 @@ def main(file_name: str = DEFAULT_INPUT_FILE, top: int = DEFAULT_TOP) -> None:
         .getOrCreate()
     )
     # fmt: on
+
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         stop_words = StopWordsRemover.loadDefaultStopWords(LANGUAGE)
         start_time = time.perf_counter()
+
         # fmt: off
         result = (
             count_words(spark_session.read.text(file_name), stop_words)
@@ -92,6 +95,7 @@ def main(file_name: str = DEFAULT_INPUT_FILE, top: int = DEFAULT_TOP) -> None:
             .collect()
         )
         # fmt: on
+
         print(f"Computing time: {time.perf_counter() - start_time:.3f} s")
         for row in result:
             print(f"{row['word']}: {row['count']}")

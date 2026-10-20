@@ -48,6 +48,7 @@ def high_temperatures(lines: DataFrame, threshold: float = DEFAULT_THRESHOLD) ->
         PySparkException: When the query runs, if a value is not a number.
     """
     temperature = functions.col("value").cast("double")
+
     # fmt: off
     return (
         lines
@@ -77,10 +78,12 @@ def main(
         .getOrCreate()
     )
     # fmt: on
+
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         temperatures = read_temperatures(spark_session, directory)
         temperatures.printSchema()
+
         # A query without aggregation only supports the "append" mode: rows are written once
         # fmt: off
         query = (
@@ -91,6 +94,7 @@ def main(
             .start()
         )
         # fmt: on
+
         query.awaitTermination(seconds)
         query.stop()
     finally:

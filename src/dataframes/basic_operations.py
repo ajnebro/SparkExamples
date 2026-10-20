@@ -264,6 +264,7 @@ def write_data_frame(data_frame: DataFrame, output_directory: str) -> None:
         output_directory: Directory where the "json" and "csv" subdirectories are created.
     """
     data_frame.write.mode("overwrite").json(f"{output_directory}/json")
+
     # fmt: off
     (
         data_frame.write
@@ -291,6 +292,7 @@ def main(
         .getOrCreate()
     )
     # fmt: on
+
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         # The DataFrame is used by many actions, so it is kept in memory

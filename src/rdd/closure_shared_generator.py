@@ -24,6 +24,7 @@ def generate_with_captured_generator(
         A random number in [0, 100] for each element.
     """
     generator = random.Random(seed)
+
     # fmt: off
     return (
         spark_context
@@ -43,6 +44,7 @@ def main() -> None:
         .setMaster("local[4]")
     )
     # fmt: on
+
     spark_context = SparkContext(conf=conf)
     try:
         spark_context.setLogLevel("ERROR")

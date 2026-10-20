@@ -63,6 +63,7 @@ class TestReadReadings:
             .start()
         )
         # fmt: on
+
         query.awaitTermination()
         rows = spark_session.table("temperature_by_sensor_test").collect()
 

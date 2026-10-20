@@ -71,6 +71,7 @@ def average_temperature_by_window(
         PySparkException: If the slide duration is longer than the window duration.
     """
     time_window = functions.window("timestamp", window_duration, slide_duration)
+
     # fmt: off
     return (
         readings
@@ -98,10 +99,12 @@ def main(directory: str = DEFAULT_STREAMING_DIRECTORY, seconds: float | None = N
         .getOrCreate()
     )
     # fmt: on
+
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         readings = read_readings(spark_session, directory)
         readings.printSchema()
+
         # Sorting a streaming aggregation is only allowed in the "complete" mode
         # fmt: off
         query = (
@@ -113,6 +116,7 @@ def main(directory: str = DEFAULT_STREAMING_DIRECTORY, seconds: float | None = N
             .start()
         )
         # fmt: on
+
         query.awaitTermination(seconds)
         query.stop()
     finally:

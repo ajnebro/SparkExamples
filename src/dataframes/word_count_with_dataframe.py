@@ -42,6 +42,7 @@ def count_words(lines: DataFrame) -> DataFrame:
             )
         ).alias("word")
     )
+
     # fmt: off
     return (
         words
@@ -69,9 +70,11 @@ def main(file_name: str = DEFAULT_INPUT_FILE, top: int = DEFAULT_TOP) -> None:
         .getOrCreate()
     )
     # fmt: on
+
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         start_time = time.perf_counter()
+
         # fmt: off
         result = (
             count_words(spark_session.read.text(file_name))
@@ -79,6 +82,7 @@ def main(file_name: str = DEFAULT_INPUT_FILE, top: int = DEFAULT_TOP) -> None:
             .collect()
         )
         # fmt: on
+
         print(f"Computing time: {time.perf_counter() - start_time:.3f} s")
         for row in result:
             print(f"{row['word']}: {row['count']}")

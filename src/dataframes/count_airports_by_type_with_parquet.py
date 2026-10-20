@@ -73,6 +73,7 @@ def main(
         .getOrCreate()
     )
     # fmt: on
+
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         write_airports_as_parquet(read_airports(spark_session, file_name), parquet_directory)

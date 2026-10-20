@@ -73,10 +73,12 @@ def main(directory: str = DEFAULT_STREAMING_DIRECTORY, seconds: float | None = N
         .getOrCreate()
     )
     # fmt: on
+
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         temperatures = read_temperatures(spark_session, directory)
         temperatures.printSchema()
+
         # An aggregation without window needs the "complete" mode: all the rows are rewritten
         # fmt: off
         query = (
@@ -87,6 +89,7 @@ def main(directory: str = DEFAULT_STREAMING_DIRECTORY, seconds: float | None = N
             .start()
         )
         # fmt: on
+
         query.awaitTermination(seconds)
         query.stop()
     finally:

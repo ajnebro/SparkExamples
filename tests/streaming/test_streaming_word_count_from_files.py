@@ -73,6 +73,7 @@ class TestReadLines:
             .start()
         )
         # fmt: on
+
         query.awaitTermination()
         rows = spark_session.table("word_count_test").collect()
 

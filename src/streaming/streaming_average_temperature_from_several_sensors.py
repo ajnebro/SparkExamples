@@ -85,10 +85,12 @@ def main(directory: str = DEFAULT_STREAMING_DIRECTORY, seconds: float | None = N
         .getOrCreate()
     )
     # fmt: on
+
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         readings = read_readings(spark_session, directory)
         readings.printSchema()
+
         # In the "update" mode only the sensors whose row has changed are printed
         # fmt: off
         query = (
@@ -99,6 +101,7 @@ def main(directory: str = DEFAULT_STREAMING_DIRECTORY, seconds: float | None = N
             .start()
         )
         # fmt: on
+
         query.awaitTermination(seconds)
         query.stop()
     finally:

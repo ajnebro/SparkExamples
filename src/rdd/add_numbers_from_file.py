@@ -40,6 +40,7 @@ def main(file_name: str = DEFAULT_INPUT_FILE) -> None:
         .setMaster("local[*]")
     )
     # fmt: on
+
     spark_context = SparkContext(conf=conf)
     try:
         spark_context.setLogLevel("ERROR")

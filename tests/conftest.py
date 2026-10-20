@@ -17,6 +17,7 @@ def spark_context() -> Iterator[SparkContext]:
         .setMaster("local[2]")
     )
     # fmt: on
+
     context = SparkContext(conf=conf)
     context.setLogLevel("ERROR")
     yield context

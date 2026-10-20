@@ -61,6 +61,7 @@ class TestReadTemperatures:
             .start()
         )
         # fmt: on
+
         query.awaitTermination()
         result = spark_session.table("high_temperature_test").collect()
 

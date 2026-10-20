@@ -56,6 +56,7 @@ def count_airports_by_country(airports: DataFrame, countries: DataFrame, top: in
     country_names = countries.select(
         functions.col("code").alias("iso_country"), functions.col("name").alias("country")
     )
+
     # fmt: off
     return (
         airports
@@ -88,6 +89,7 @@ def main(
         .getOrCreate()
     )
     # fmt: on
+
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         start_time = time.perf_counter()

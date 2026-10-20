@@ -82,6 +82,7 @@ def main(file_name: str = DEFAULT_INPUT_FILE, country: str = DEFAULT_COUNTRY) ->
         .getOrCreate()
     )
     # fmt: on
+
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         start_time = time.perf_counter()

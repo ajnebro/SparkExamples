@@ -59,6 +59,7 @@ def main() -> None:
         .setMaster("local[4]")
     )
     # fmt: on
+
     spark_context = SparkContext(conf=conf)
     try:
         spark_context.setLogLevel("ERROR")

@@ -90,6 +90,7 @@ class TestReadReadings:
             .start()
         )
         # fmt: on
+
         query.awaitTermination()
         rows = spark_session.table("windows_test").collect()
 

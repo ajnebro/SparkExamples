@@ -52,6 +52,7 @@ class TestReadTemperatures:
             .start()
         )
         # fmt: on
+
         query.awaitTermination()
         result = spark_session.table("average_temperature_test").first()["average_temperature"]
 
