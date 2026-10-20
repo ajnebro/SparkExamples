@@ -192,5 +192,12 @@ class TestWriteDataFrame:
         write_data_frame(people, str(tmp_path))
 
         json_rows = spark_session.read.json(str(tmp_path / "json")).count()
-        csv_rows = spark_session.read.option("header", "true").csv(str(tmp_path / "csv")).count()
+        # fmt: off
+        csv_rows = (
+            spark_session.read
+            .option("header", "true")
+            .csv(str(tmp_path / "csv"))
+            .count()
+        )
+        # fmt: on
         assert (json_rows, csv_rows) == (4, 4)

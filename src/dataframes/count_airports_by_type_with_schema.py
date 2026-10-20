@@ -56,12 +56,15 @@ def read_airports_with_schema(spark_session: SparkSession, file_name: str) -> Da
     Returns:
         A DataFrame with one row per airport.
     """
+    # fmt: off
     return (
-        spark_session.read.schema(AIRPORTS_SCHEMA)
+        spark_session.read
+        .schema(AIRPORTS_SCHEMA)
         .option("header", "true")
         .option("enforceSchema", "false")
         .csv(file_name)
     )
+    # fmt: on
 
 
 def main(file_name: str = DEFAULT_INPUT_FILE, country: str = DEFAULT_COUNTRY) -> None:
@@ -71,11 +74,14 @@ def main(file_name: str = DEFAULT_INPUT_FILE, country: str = DEFAULT_COUNTRY) ->
         file_name: Path of the airports CSV file.
         country: ISO 3166-1 alpha-2 code of the country whose airports are counted.
     """
+    # fmt: off
     spark_session = (
-        SparkSession.builder.appName("CountAirportsByTypeWithSchema")
+        SparkSession.builder
+        .appName("CountAirportsByTypeWithSchema")
         .master("local[*]")
         .getOrCreate()
     )
+    # fmt: on
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         start_time = time.perf_counter()

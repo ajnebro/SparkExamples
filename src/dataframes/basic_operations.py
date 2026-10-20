@@ -25,12 +25,15 @@ def read_personal_data(spark_session: SparkSession, file_name: str) -> DataFrame
     Returns:
         A DataFrame with the content of the file.
     """
+    # fmt: off
     return (
-        spark_session.read.option("header", "true")
+        spark_session.read
+        .option("header", "true")
         .option("inferSchema", "true")
         .option("dateFormat", "yyyy-MM-dd")
         .csv(file_name)
     )
+    # fmt: on
 
 
 def add_senior_column(data_frame: DataFrame, age_threshold: int = SENIOR_AGE) -> DataFrame:
@@ -90,6 +93,7 @@ def mean_weight_by_age_group(data_frame: DataFrame) -> DataFrame:
     Returns:
         A DataFrame with the columns "AgeGroup", "People" and "MeanWeight", sorted by group.
     """
+    # fmt: off
     return (
         add_age_group_column(data_frame)
         .groupBy("AgeGroup")
@@ -99,6 +103,7 @@ def mean_weight_by_age_group(data_frame: DataFrame) -> DataFrame:
         )
         .orderBy("AgeGroup")
     )
+    # fmt: on
 
 
 def sort_by_age_and_weight(data_frame: DataFrame) -> DataFrame:
@@ -259,7 +264,14 @@ def write_data_frame(data_frame: DataFrame, output_directory: str) -> None:
         output_directory: Directory where the "json" and "csv" subdirectories are created.
     """
     data_frame.write.mode("overwrite").json(f"{output_directory}/json")
-    data_frame.write.mode("overwrite").option("header", "true").csv(f"{output_directory}/csv")
+    # fmt: off
+    (
+        data_frame.write
+        .mode("overwrite")
+        .option("header", "true")
+        .csv(f"{output_directory}/csv")
+    )
+    # fmt: on
 
 
 def main(
@@ -271,9 +283,14 @@ def main(
         file_name: Path of the CSV file with the personal data.
         output_directory: Directory where the data is written in JSON and CSV formats.
     """
+    # fmt: off
     spark_session = (
-        SparkSession.builder.appName("DataFrameBasicOperations").master("local[*]").getOrCreate()
+        SparkSession.builder
+        .appName("DataFrameBasicOperations")
+        .master("local[*]")
+        .getOrCreate()
     )
+    # fmt: on
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         # The DataFrame is used by many actions, so it is kept in memory

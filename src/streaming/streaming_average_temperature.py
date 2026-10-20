@@ -23,7 +23,13 @@ def read_temperatures(spark_session: SparkSession, directory: str) -> DataFrame:
     Returns:
         A streaming DataFrame with one row per line of text, in the column "value".
     """
-    return spark_session.readStream.format("text").load(directory)
+    # fmt: off
+    return (
+        spark_session.readStream
+        .format("text")
+        .load(directory)
+    )
+    # fmt: on
 
 
 def average_temperature(lines: DataFrame) -> DataFrame:
@@ -49,20 +55,28 @@ def main(directory: str = DEFAULT_STREAMING_DIRECTORY, seconds: float | None = N
         directory: Directory where the sensor writes its files.
         seconds: Time the query runs. If `None`, it runs until it is interrupted.
     """
+    # fmt: off
     spark_session = (
-        SparkSession.builder.appName("StreamingAverageTemperature").master("local[*]").getOrCreate()
+        SparkSession.builder
+        .appName("StreamingAverageTemperature")
+        .master("local[*]")
+        .getOrCreate()
     )
+    # fmt: on
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         temperatures = read_temperatures(spark_session, directory)
         temperatures.printSchema()
         # An aggregation without window needs the "complete" mode: all the rows are rewritten
+        # fmt: off
         query = (
             average_temperature(temperatures)
-            .writeStream.outputMode("complete")
+            .writeStream
+            .outputMode("complete")
             .format("console")
             .start()
         )
+        # fmt: on
         query.awaitTermination(seconds)
         query.stop()
     finally:

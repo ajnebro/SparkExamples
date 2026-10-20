@@ -42,7 +42,14 @@ def count_words(lines: DataFrame) -> DataFrame:
             )
         ).alias("word")
     )
-    return words.groupBy("word").count().orderBy(functions.desc("count"), "word")
+    # fmt: off
+    return (
+        words
+        .groupBy("word")
+        .count()
+        .orderBy(functions.desc("count"), "word")
+    )
+    # fmt: on
 
 
 def main(file_name: str = DEFAULT_INPUT_FILE, top: int = DEFAULT_TOP) -> None:
@@ -52,17 +59,26 @@ def main(file_name: str = DEFAULT_INPUT_FILE, top: int = DEFAULT_TOP) -> None:
         file_name: Path of the text file.
         top: Number of words to show.
     """
+    # fmt: off
     spark_session = (
-        SparkSession.builder.appName("WordCountWithDataFrame")
+        SparkSession.builder
+        .appName("WordCountWithDataFrame")
         .master("local[*]")
         # The default is 200 partitions, too many for this data (see the module docstring)
         .config("spark.sql.shuffle.partitions", SHUFFLE_PARTITIONS)
         .getOrCreate()
     )
+    # fmt: on
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         start_time = time.perf_counter()
-        result = count_words(spark_session.read.text(file_name)).limit(top).collect()
+        # fmt: off
+        result = (
+            count_words(spark_session.read.text(file_name))
+            .limit(top)
+            .collect()
+        )
+        # fmt: on
         print(f"Computing time: {time.perf_counter() - start_time:.3f} s")
         for row in result:
             print(f"{row['word']}: {row['count']}")

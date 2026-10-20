@@ -55,7 +55,13 @@ def main(
     try:
         spark_context.setLogLevel("ERROR")
         # The RDD is used by several actions, so it is kept in memory
-        lines = spark_context.textFile(file_name).persist()
+        # fmt: off
+        lines = (
+            spark_context
+            .textFile(file_name)
+            .persist()
+        )
+        # fmt: on
         for word in count_words:
             print(f"Lines containing '{word}': {count_lines_containing(lines, word)}")
         filter_lines_containing(lines, extract_word).saveAsTextFile(output_directory)

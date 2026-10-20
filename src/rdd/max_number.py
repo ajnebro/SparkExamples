@@ -24,7 +24,13 @@ def max_number(spark_context: SparkContext, numbers: list[int]) -> int:
 
 def main() -> None:
     """Run the example."""
-    conf = SparkConf().setAppName("MaxNumber").setMaster("local[*]")
+    # fmt: off
+    conf = (
+        SparkConf()
+        .setAppName("MaxNumber")
+        .setMaster("local[*]")
+    )
+    # fmt: on
     spark_context = SparkContext(conf=conf)
     try:
         spark_context.setLogLevel("ERROR")

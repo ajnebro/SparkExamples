@@ -42,13 +42,16 @@ class TestReadTemperatures:
             write_reading(tmp_path, temperature)
         stream = average_temperature(read_temperatures(spark_session, str(tmp_path)))
 
+        # fmt: off
         query = (
-            stream.writeStream.outputMode("complete")
+            stream.writeStream
+            .outputMode("complete")
             .format("memory")
             .queryName("average_temperature_test")
             .trigger(availableNow=True)
             .start()
         )
+        # fmt: on
         query.awaitTermination()
         result = spark_session.table("average_temperature_test").first()["average_temperature"]
 

@@ -25,7 +25,13 @@ def read_temperatures(spark_session: SparkSession, directory: str) -> DataFrame:
     Returns:
         A streaming DataFrame with one row per line of text, in the column "value".
     """
-    return spark_session.readStream.format("text").load(directory)
+    # fmt: off
+    return (
+        spark_session.readStream
+        .format("text")
+        .load(directory)
+    )
+    # fmt: on
 
 
 def high_temperatures(lines: DataFrame, threshold: float = DEFAULT_THRESHOLD) -> DataFrame:
@@ -42,7 +48,13 @@ def high_temperatures(lines: DataFrame, threshold: float = DEFAULT_THRESHOLD) ->
         PySparkException: When the query runs, if a value is not a number.
     """
     temperature = functions.col("value").cast("double")
-    return lines.select(temperature.alias("temperature")).where(temperature > threshold)
+    # fmt: off
+    return (
+        lines
+        .select(temperature.alias("temperature"))
+        .where(temperature > threshold)
+    )
+    # fmt: on
 
 
 def main(
@@ -57,22 +69,28 @@ def main(
         threshold: Temperatures must be strictly higher than this value to be shown.
         seconds: Time the query runs. If `None`, it runs until it is interrupted.
     """
+    # fmt: off
     spark_session = (
-        SparkSession.builder.appName("StreamingFindHighTemperature")
+        SparkSession.builder
+        .appName("StreamingFindHighTemperature")
         .master("local[*]")
         .getOrCreate()
     )
+    # fmt: on
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         temperatures = read_temperatures(spark_session, directory)
         temperatures.printSchema()
         # A query without aggregation only supports the "append" mode: rows are written once
+        # fmt: off
         query = (
             high_temperatures(temperatures, threshold)
-            .writeStream.outputMode("append")
+            .writeStream
+            .outputMode("append")
             .format("console")
             .start()
         )
+        # fmt: on
         query.awaitTermination(seconds)
         query.stop()
     finally:

@@ -30,7 +30,14 @@ def write_airports_as_parquet(airports: DataFrame, directory: str) -> None:
         airports: DataFrame with an "iso_country" column.
         directory: Directory where the Parquet files are written.
     """
-    airports.write.mode("overwrite").partitionBy("iso_country").parquet(directory)
+    # fmt: off
+    (
+        airports.write
+        .mode("overwrite")
+        .partitionBy("iso_country")
+        .parquet(directory)
+    )
+    # fmt: on
 
 
 def read_airports_from_parquet(spark_session: SparkSession, directory: str) -> DataFrame:
@@ -58,11 +65,14 @@ def main(
         parquet_directory: Directory where the airports are written in Parquet format.
         country: ISO 3166-1 alpha-2 code of the country whose airports are counted.
     """
+    # fmt: off
     spark_session = (
-        SparkSession.builder.appName("CountAirportsByTypeWithParquet")
+        SparkSession.builder
+        .appName("CountAirportsByTypeWithParquet")
         .master("local[*]")
         .getOrCreate()
     )
+    # fmt: on
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         write_airports_as_parquet(read_airports(spark_session, file_name), parquet_directory)

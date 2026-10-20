@@ -35,16 +35,25 @@ def generate_reproducible_numbers(
     Returns:
         A random number in [0, 100] for each element.
     """
+    # fmt: off
     return (
-        spark_context.parallelize(data, num_slices)
+        spark_context
+        .parallelize(data, num_slices)
         .map(lambda x: random_from_element(x, seed))
         .collect()
     )
+    # fmt: on
 
 
 def main() -> None:
     """Run the example."""
-    conf = SparkConf().setAppName("ClosureReproducibleRandom").setMaster("local[4]")
+    # fmt: off
+    conf = (
+        SparkConf()
+        .setAppName("ClosureReproducibleRandom")
+        .setMaster("local[4]")
+    )
+    # fmt: on
     spark_context = SparkContext(conf=conf)
     try:
         spark_context.setLogLevel("ERROR")

@@ -17,7 +17,14 @@ def multiply_by_factor(spark_context: SparkContext, data: list[int], factor: int
     Returns:
         The multiplied integers, in the original order.
     """
-    return spark_context.parallelize(data).map(lambda x: x * factor).collect()
+    # fmt: off
+    return (
+        spark_context
+        .parallelize(data)
+        .map(lambda x: x * factor)
+        .collect()
+    )
+    # fmt: on
 
 
 def count_with_captured_list(spark_context: SparkContext, data: list[int]) -> list[int]:
@@ -45,7 +52,13 @@ def count_with_captured_list(spark_context: SparkContext, data: list[int]) -> li
 
 def main() -> None:
     """Run the example."""
-    conf = SparkConf().setAppName("ClosureDriverVariable").setMaster("local[4]")
+    # fmt: off
+    conf = (
+        SparkConf()
+        .setAppName("ClosureDriverVariable")
+        .setMaster("local[4]")
+    )
+    # fmt: on
     spark_context = SparkContext(conf=conf)
     try:
         spark_context.setLogLevel("ERROR")

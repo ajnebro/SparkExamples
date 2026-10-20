@@ -36,7 +36,14 @@ def read_readings(spark_session: SparkSession, directory: str) -> DataFrame:
     Returns:
         A streaming DataFrame with the columns of `READING_SCHEMA`.
     """
-    return spark_session.readStream.format("csv").schema(READING_SCHEMA).load(directory)
+    # fmt: off
+    return (
+        spark_session.readStream
+        .format("csv")
+        .schema(READING_SCHEMA)
+        .load(directory)
+    )
+    # fmt: on
 
 
 def temperature_by_sensor(readings: DataFrame) -> DataFrame:
@@ -49,10 +56,16 @@ def temperature_by_sensor(readings: DataFrame) -> DataFrame:
         A DataFrame with one row per sensor and the columns "sensor", "average_temperature"
         and "max_temperature".
     """
-    return readings.groupBy("sensor").agg(
-        functions.avg("temperature").alias("average_temperature"),
-        functions.max("temperature").alias("max_temperature"),
+    # fmt: off
+    return (
+        readings
+        .groupBy("sensor")
+        .agg(
+            functions.avg("temperature").alias("average_temperature"),
+            functions.max("temperature").alias("max_temperature"),
+        )
     )
+    # fmt: on
 
 
 def main(directory: str = DEFAULT_STREAMING_DIRECTORY, seconds: float | None = None) -> None:
@@ -62,24 +75,30 @@ def main(directory: str = DEFAULT_STREAMING_DIRECTORY, seconds: float | None = N
         directory: Directory where the sensors write their files.
         seconds: Time the query runs. If `None`, it runs until it is interrupted.
     """
+    # fmt: off
     spark_session = (
-        SparkSession.builder.appName("StreamingAverageTemperatureFromSeveralSensors")
+        SparkSession.builder
+        .appName("StreamingAverageTemperatureFromSeveralSensors")
         .master("local[*]")
         # Each micro-batch shuffles the data by sensor: the default 200 partitions are too many
         .config("spark.sql.shuffle.partitions", 4)
         .getOrCreate()
     )
+    # fmt: on
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         readings = read_readings(spark_session, directory)
         readings.printSchema()
         # In the "update" mode only the sensors whose row has changed are printed
+        # fmt: off
         query = (
             temperature_by_sensor(readings)
-            .writeStream.outputMode("update")
+            .writeStream
+            .outputMode("update")
             .format("console")
             .start()
         )
+        # fmt: on
         query.awaitTermination(seconds)
         query.stop()
     finally:

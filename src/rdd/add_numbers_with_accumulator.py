@@ -41,7 +41,13 @@ def add_numbers_counting_operations(
 
 def main() -> None:
     """Run the example."""
-    conf = SparkConf().setAppName("AddNumbersWithAccumulator").setMaster("local[*]")
+    # fmt: off
+    conf = (
+        SparkConf()
+        .setAppName("AddNumbersWithAccumulator")
+        .setMaster("local[*]")
+    )
+    # fmt: on
     spark_context = SparkContext(conf=conf)
     try:
         spark_context.setLogLevel("ERROR")

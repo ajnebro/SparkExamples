@@ -45,7 +45,13 @@ def read_lines(spark_session: SparkSession, directory: str) -> DataFrame:
     Returns:
         A streaming DataFrame with one row per line of text, in the column "value".
     """
-    return spark_session.readStream.format("text").load(directory)
+    # fmt: off
+    return (
+        spark_session.readStream
+        .format("text")
+        .load(directory)
+    )
+    # fmt: on
 
 
 def count_words(lines: DataFrame) -> DataFrame:
@@ -63,12 +69,15 @@ def count_words(lines: DataFrame) -> DataFrame:
             "word"
         )
     )
+    # fmt: off
     return (
-        words.where(functions.col("word") != "")
+        words
+        .where(functions.col("word") != "")
         .groupBy("word")
         .count()
         .orderBy(functions.desc("count"), "word")
     )
+    # fmt: on
 
 
 def main(directory: str = DEFAULT_STREAMING_DIRECTORY, seconds: float | None = None) -> None:
@@ -78,19 +87,29 @@ def main(directory: str = DEFAULT_STREAMING_DIRECTORY, seconds: float | None = N
         directory: Directory where the text files are written.
         seconds: Time the query runs. If `None`, it runs until it is interrupted.
     """
+    # fmt: off
     spark_session = (
-        SparkSession.builder.appName("StreamingWordCountFromFiles")
+        SparkSession.builder
+        .appName("StreamingWordCountFromFiles")
         .master("local[*]")
         # The default is 200 partitions, too many for this data (see the module docstring)
         .config("spark.sql.shuffle.partitions", SHUFFLE_PARTITIONS)
         .getOrCreate()
     )
+    # fmt: on
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         lines = read_lines(spark_session, directory)
         lines.printSchema()
         # Sorting a streaming aggregation is only allowed in the "complete" mode
-        query = count_words(lines).writeStream.outputMode("complete").format("console").start()
+        # fmt: off
+        query = (
+            count_words(lines).writeStream
+            .outputMode("complete")
+            .format("console")
+            .start()
+        )
+        # fmt: on
         query.awaitTermination(seconds)
         query.stop()
     finally:

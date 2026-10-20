@@ -63,13 +63,16 @@ class TestReadLines:
         (tmp_path / "2.txt").write_text("Hidalgo\n")
         stream = count_words(read_lines(spark_session, str(tmp_path)))
 
+        # fmt: off
         query = (
-            stream.writeStream.outputMode("complete")
+            stream.writeStream
+            .outputMode("complete")
             .format("memory")
             .queryName("word_count_test")
             .trigger(availableNow=True)
             .start()
         )
+        # fmt: on
         query.awaitTermination()
         rows = spark_session.table("word_count_test").collect()
 

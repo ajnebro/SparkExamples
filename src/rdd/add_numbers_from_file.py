@@ -17,7 +17,14 @@ def add_numbers_from_file(spark_context: SparkContext, file_name: str) -> int:
     Returns:
         The sum of all the numbers in the file.
     """
-    return spark_context.textFile(file_name).map(lambda line: int(line)).reduce(lambda a, b: a + b)
+    # fmt: off
+    return (
+        spark_context
+        .textFile(file_name)
+        .map(lambda line: int(line))
+        .reduce(lambda a, b: a + b)
+    )
+    # fmt: on
 
 
 def main(file_name: str = DEFAULT_INPUT_FILE) -> None:
@@ -26,7 +33,13 @@ def main(file_name: str = DEFAULT_INPUT_FILE) -> None:
     Args:
         file_name: Path of the text file with the numbers to add.
     """
-    conf = SparkConf().setAppName("AddNumbersFromFile").setMaster("local[*]")
+    # fmt: off
+    conf = (
+        SparkConf()
+        .setAppName("AddNumbersFromFile")
+        .setMaster("local[*]")
+    )
+    # fmt: on
     spark_context = SparkContext(conf=conf)
     try:
         spark_context.setLogLevel("ERROR")

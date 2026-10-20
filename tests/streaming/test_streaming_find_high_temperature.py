@@ -51,13 +51,16 @@ class TestReadTemperatures:
             write_reading(tmp_path, temperature)
         stream = high_temperatures(read_temperatures(spark_session, str(tmp_path)))
 
+        # fmt: off
         query = (
-            stream.writeStream.outputMode("append")
+            stream.writeStream
+            .outputMode("append")
             .format("memory")
             .queryName("high_temperature_test")
             .trigger(availableNow=True)
             .start()
         )
+        # fmt: on
         query.awaitTermination()
         result = spark_session.table("high_temperature_test").collect()
 

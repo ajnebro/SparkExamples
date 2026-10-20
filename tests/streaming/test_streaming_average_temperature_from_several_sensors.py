@@ -53,13 +53,16 @@ class TestReadReadings:
             write_reading(tmp_path, sensor, temperature)
         stream = temperature_by_sensor(read_readings(spark_session, str(tmp_path)))
 
+        # fmt: off
         query = (
-            stream.writeStream.outputMode("complete")
+            stream.writeStream
+            .outputMode("complete")
             .format("memory")
             .queryName("temperature_by_sensor_test")
             .trigger(availableNow=True)
             .start()
         )
+        # fmt: on
         query.awaitTermination()
         rows = spark_session.table("temperature_by_sensor_test").collect()
 

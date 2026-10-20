@@ -25,7 +25,14 @@ def read_airports(spark_session: SparkSession, file_name: str) -> DataFrame:
     Returns:
         A DataFrame with one row per airport.
     """
-    return spark_session.read.option("header", "true").option("inferSchema", "true").csv(file_name)
+    # fmt: off
+    return (
+        spark_session.read
+        .option("header", "true")
+        .option("inferSchema", "true")
+        .csv(file_name)
+    )
+    # fmt: on
 
 
 def count_airports_by_type(airports: DataFrame, country: str) -> DataFrame:
@@ -38,12 +45,15 @@ def count_airports_by_type(airports: DataFrame, country: str) -> DataFrame:
     Returns:
         A DataFrame with the columns "type" and "count".
     """
+    # fmt: off
     return (
-        airports.filter(functions.col("iso_country") == country)
+        airports
+        .filter(functions.col("iso_country") == country)
         .groupBy("type")
         .count()
         .orderBy(functions.col("count").desc(), functions.col("type"))
     )
+    # fmt: on
 
 
 def main(file_name: str = DEFAULT_INPUT_FILE, country: str = DEFAULT_COUNTRY) -> None:
@@ -53,9 +63,14 @@ def main(file_name: str = DEFAULT_INPUT_FILE, country: str = DEFAULT_COUNTRY) ->
         file_name: Path of the airports CSV file.
         country: ISO 3166-1 alpha-2 code of the country whose airports are counted.
     """
+    # fmt: off
     spark_session = (
-        SparkSession.builder.appName("CountAirportsByType").master("local[*]").getOrCreate()
+        SparkSession.builder
+        .appName("CountAirportsByType")
+        .master("local[*]")
+        .getOrCreate()
     )
+    # fmt: on
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         start_time = time.perf_counter()

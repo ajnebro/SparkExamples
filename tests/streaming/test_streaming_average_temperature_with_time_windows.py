@@ -80,13 +80,16 @@ class TestReadReadings:
             read_readings(spark_session, str(tmp_path)), "10 seconds", "10 seconds"
         )
 
+        # fmt: off
         query = (
-            stream.writeStream.outputMode("complete")
+            stream.writeStream
+            .outputMode("complete")
             .format("memory")
             .queryName("windows_test")
             .trigger(availableNow=True)
             .start()
         )
+        # fmt: on
         query.awaitTermination()
         rows = spark_session.table("windows_test").collect()
 

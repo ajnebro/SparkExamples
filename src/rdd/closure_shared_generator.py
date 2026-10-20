@@ -24,16 +24,25 @@ def generate_with_captured_generator(
         A random number in [0, 100] for each element.
     """
     generator = random.Random(seed)
+    # fmt: off
     return (
-        spark_context.parallelize(data, num_slices)
+        spark_context
+        .parallelize(data, num_slices)
         .map(lambda _: generator.randint(0, 100))
         .collect()
     )
+    # fmt: on
 
 
 def main() -> None:
     """Run the example."""
-    conf = SparkConf().setAppName("ClosureSharedGenerator").setMaster("local[4]")
+    # fmt: off
+    conf = (
+        SparkConf()
+        .setAppName("ClosureSharedGenerator")
+        .setMaster("local[4]")
+    )
+    # fmt: on
     spark_context = SparkContext(conf=conf)
     try:
         spark_context.setLogLevel("ERROR")

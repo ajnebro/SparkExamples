@@ -30,9 +30,14 @@ def count_words(lines: RDD[str]) -> RDD[tuple[str, int]]:
     Returns:
         An RDD of (word, count) pairs.
     """
+    # fmt: off
     return (
-        lines.flatMap(split_into_words).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a + b)
+        lines
+        .flatMap(split_into_words)
+        .map(lambda word: (word, 1))
+        .reduceByKey(lambda a, b: a + b)
     )
+    # fmt: on
 
 
 def most_frequent_words(word_counts: RDD[tuple[str, int]], top: int) -> list[tuple[str, int]]:
@@ -58,7 +63,13 @@ def main(file_name: str = DEFAULT_INPUT_FILE, top: int = DEFAULT_TOP) -> None:
         file_name: Path of the text file.
         top: Number of words to show.
     """
-    conf = SparkConf().setAppName("WordCount").setMaster("local[*]")
+    # fmt: off
+    conf = (
+        SparkConf()
+        .setAppName("WordCount")
+        .setMaster("local[*]")
+    )
+    # fmt: on
     spark_context = SparkContext(conf=conf)
     try:
         spark_context.setLogLevel("ERROR")

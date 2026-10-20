@@ -40,7 +40,14 @@ def read_readings(spark_session: SparkSession, directory: str) -> DataFrame:
     Returns:
         A streaming DataFrame with the columns of `READING_SCHEMA`.
     """
-    return spark_session.readStream.format("csv").schema(READING_SCHEMA).load(directory)
+    # fmt: off
+    return (
+        spark_session.readStream
+        .format("csv")
+        .schema(READING_SCHEMA)
+        .load(directory)
+    )
+    # fmt: on
 
 
 def average_temperature_by_window(
@@ -64,11 +71,14 @@ def average_temperature_by_window(
         PySparkException: If the slide duration is longer than the window duration.
     """
     time_window = functions.window("timestamp", window_duration, slide_duration)
+    # fmt: off
     return (
-        readings.groupBy(time_window, "sensor")
+        readings
+        .groupBy(time_window, "sensor")
         .agg(functions.avg("temperature").alias("average_temperature"))
         .orderBy("sensor", "window")
     )
+    # fmt: on
 
 
 def main(directory: str = DEFAULT_STREAMING_DIRECTORY, seconds: float | None = None) -> None:
@@ -78,25 +88,31 @@ def main(directory: str = DEFAULT_STREAMING_DIRECTORY, seconds: float | None = N
         directory: Directory where the sensors write their files.
         seconds: Time the query runs. If `None`, it runs until it is interrupted.
     """
+    # fmt: off
     spark_session = (
-        SparkSession.builder.appName("StreamingAverageTemperatureWithTimeWindows")
+        SparkSession.builder
+        .appName("StreamingAverageTemperatureWithTimeWindows")
         .master("local[*]")
         # Each micro-batch shuffles the data by window and sensor: 200 partitions are too many
         .config("spark.sql.shuffle.partitions", 4)
         .getOrCreate()
     )
+    # fmt: on
     try:
         spark_session.sparkContext.setLogLevel("ERROR")
         readings = read_readings(spark_session, directory)
         readings.printSchema()
         # Sorting a streaming aggregation is only allowed in the "complete" mode
+        # fmt: off
         query = (
             average_temperature_by_window(readings)
-            .writeStream.outputMode("complete")
+            .writeStream
+            .outputMode("complete")
             .format("console")
             .option("truncate", False)
             .start()
         )
+        # fmt: on
         query.awaitTermination(seconds)
         query.stop()
     finally:
