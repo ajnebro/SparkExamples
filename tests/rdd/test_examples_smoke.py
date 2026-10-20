@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pytest
 
+from streaming.temperature_sensor_generator import write_reading
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 pytestmark = pytest.mark.smoke
@@ -96,3 +98,30 @@ class TestExamples:
 
         assert "United States" in output
         assert "BroadcastHashJoin" in output
+
+    def test_should_run_streaming_average_temperature_example(self) -> None:
+        """Given the files of a sensor, the streaming query prints their average and stops."""
+        directory = PROJECT_ROOT / "output" / "streaming"
+        shutil.rmtree(directory, ignore_errors=True)
+        directory.mkdir(parents=True)
+        for temperature in (10.0, 20.0, 33.0):
+            write_reading(directory, temperature)
+
+        try:
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "-c",
+                    "from streaming.streaming_average_temperature import main; main(seconds=20)",
+                ],
+                cwd=PROJECT_ROOT,
+                capture_output=True,
+                text=True,
+                timeout=120,
+                check=True,
+            )
+        finally:
+            shutil.rmtree(directory, ignore_errors=True)
+
+        assert "average_temperature" in completed.stdout
+        assert "21.0" in completed.stdout
