@@ -103,6 +103,13 @@ class TestExamples:
         assert "United States" in output
         assert "BroadcastHashJoin" in output
 
+    def test_should_run_word_count_without_stop_words_example(self) -> None:
+        """Given Don Quijote, the example prints its most frequent words without stop words."""
+        output = run_example("dataframes.word_count_without_stop_words")
+
+        assert "sancho: " in output
+        assert "\nque: " not in output
+
     def test_should_run_streaming_average_temperature_example(self) -> None:
         """Given the files of a sensor, the streaming query prints their average and stops."""
         directory = PROJECT_ROOT / "output" / "streaming"
