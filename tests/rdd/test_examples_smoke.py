@@ -214,3 +214,30 @@ class TestExamples:
         assert "sensor_a" in completed.stdout
         assert "window" in completed.stdout
         assert "15.0" in completed.stdout
+
+    def test_should_run_streaming_word_count_from_files_example(self) -> None:
+        """Given text files in the directory, the query prints the count of each word."""
+        directory = PROJECT_ROOT / "output" / "streaming"
+        shutil.rmtree(directory, ignore_errors=True)
+        directory.mkdir(parents=True)
+        (directory / "text.txt").write_text("El hidalgo, el Quijote\n")
+
+        try:
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "-c",
+                    "from streaming.streaming_word_count_from_files import main; main(seconds=20)",
+                ],
+                cwd=PROJECT_ROOT,
+                capture_output=True,
+                text=True,
+                timeout=120,
+                check=True,
+            )
+        finally:
+            shutil.rmtree(directory, ignore_errors=True)
+
+        assert "hidalgo" in completed.stdout
+        assert "quijote" in completed.stdout
+        assert "El" not in completed.stdout
