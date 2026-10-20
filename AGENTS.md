@@ -25,6 +25,7 @@ must be written in **English**.
 ```text
 src/rdd/             Examples based on the RDD API (top-level package `rdd`)
 src/dataframes/      Examples based on the DataFrame API (top-level package `dataframes`)
+src/streaming/       Examples based on Structured Streaming (top-level package `streaming`)
 tests/               pytest tests, mirroring the layout of src/
 data/                Input files used by the examples (`output/` is git-ignored)
 pyproject.toml       Package metadata, dependencies, ruff and pytest configuration
@@ -93,6 +94,12 @@ This rule takes precedence over the general guidelines below when they conflict.
   tests. Do not create a new context or session per test.
 - Every example also has a smoke test in `tests/rdd/test_examples_smoke.py` (marker `smoke`)
   that runs it as a separate process; register new examples there.
+
+## Documentation
+
+Every package under `src/` has a `README.md` with a table of its examples (what each one shows
+and what to observe). Register every new example in the README of its package, not in the
+main `README.md`, which only links to them.
 
 ## Git workflow
 
