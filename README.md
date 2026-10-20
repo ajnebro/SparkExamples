@@ -4,6 +4,18 @@ A collection of introductory code examples for **Apache Spark 4.2.0**, written i
 **Python** (PySpark). They are meant as learning material, and progress from the basic RDD
 API towards more advanced topics.
 
+> **AI-assisted project.** This project is used for teaching, and it is developed with the assistance of AI coding agents (such as [Claude Code](https://claude.com/claude-code)). To keep that work consistent and transparent, the repository
+> includes the instructions that the agents must follow:
+>
+> - [AGENTS.md](AGENTS.md): guidance shared by all the agents ([CLAUDE.md](CLAUDE.md) points
+>   to it for Claude Code).
+> - [CODING_GUIDELINES.md](CODING_GUIDELINES.md): style and testing rules for the code.
+> - [GIT_GUIDELINES.md](GIT_GUIDELINES.md): rules for commits and branches.
+>
+> The commits made with an agent are marked with a `Co-Authored-By` trailer. As with any
+> other source, check what you learn from the examples against the
+> [Spark documentation](https://spark.apache.org/docs/latest/).
+
 ## Requirements
 
 - Python 3.11 or later
