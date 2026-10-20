@@ -71,12 +71,15 @@ run `pip install pyspark==4.2.0`.
 src/rdd/          Examples based on the RDD API
 src/dataframes/   Examples based on the DataFrame API
 src/streaming/    Examples based on Structured Streaming
+src/ml/           Examples based on Spark ML
 tests/            pytest tests (one test module per example)
 data/             Input files used by the examples
 ```
 
-The examples take no command line arguments: their inputs (file names, words, ...) are
-constants at the top of each module, so they can be changed by editing them.
+The Spark examples take no command line arguments: their inputs (file names, words, ...) are
+constants at the top of each module, so they can be changed by editing them. Only the programs
+that generate or download data for the streaming examples take arguments (see the
+[streaming README](src/streaming/README.md)).
 
 ## Examples
 
@@ -89,6 +92,7 @@ describes every example and what to observe in it:
    Parquet and joins.
 3. [Structured Streaming](src/streaming/README.md): processing files as they arrive in a
    directory.
+4. [Spark ML](src/ml/README.md): feature transformers and reading data in LIBSVM format.
 
 ### Running an example
 

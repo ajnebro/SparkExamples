@@ -26,6 +26,7 @@ must be written in **English**.
 src/rdd/             Examples based on the RDD API (top-level package `rdd`)
 src/dataframes/      Examples based on the DataFrame API (top-level package `dataframes`)
 src/streaming/       Examples based on Structured Streaming (top-level package `streaming`)
+src/ml/              Examples based on Spark ML (top-level package `ml`)
 tests/               pytest tests, mirroring the layout of src/
 data/                Input files used by the examples (`output/` is git-ignored)
 pyproject.toml       Package metadata, dependencies, ruff and pytest configuration
