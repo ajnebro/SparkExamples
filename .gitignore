@@ -17,3 +17,5 @@ dist/
 # Large data files downloaded by the user (see README.md)
 data/airports.csv
 data/countries.csv
+data/Crimes_*
+data/crimes.zip
