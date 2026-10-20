@@ -36,6 +36,30 @@ All source code, identifiers, and comments **must be written in English**.
 - Clarity over cleverness: no "smart" one-liners
 - Every function has a docstring, and every example includes its tests
 
+### Chained Spark calls
+
+When a statement chains two or more calls of a Spark pipeline (`SparkSession.builder`,
+`read`/`readStream`/`write`/`writeStream`, DataFrame and RDD transformations, `SparkConf`),
+write each call on its own line, starting with the dot and aligned with the others, inside
+parentheses:
+
+```python
+# fmt: off
+word_counts = (
+    words
+    .groupBy("word")
+    .count()
+    .orderBy(functions.desc("count"), "word")
+)
+# fmt: on
+```
+
+- `ruff format` joins short chains into one line, so the statement is wrapped in
+  `# fmt: off` / `# fmt: on` to keep the layout. `make format-check` still passes.
+- Exceptions, kept on one line: a single call followed by a final action
+  (`data_frame.select("Name").show()`, `spark_context.parallelize(numbers).reduce(add)`), and
+  column expressions (`functions.col("Age").desc()`).
+
 ## 6. Unit Testing
 
 - Framework: **pytest**

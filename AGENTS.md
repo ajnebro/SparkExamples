@@ -72,6 +72,8 @@ This rule takes precedence over the general guidelines below when they conflict.
 - Raise specific exceptions (`ValueError`, `TypeError`, ...) for invalid input; use `with`
   for resources.
 - Formatting and linting with **ruff** (line length 100).
+- Chained Spark calls: one call per line, starting with the dot and aligned, inside `# fmt: off` /
+  `# fmt: on` (see "Chained Spark calls" in [CODING_GUIDELINES.md](CODING_GUIDELINES.md)).
 
 ## Spark conventions
 
