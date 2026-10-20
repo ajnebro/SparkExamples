@@ -8,6 +8,9 @@ from pathlib import Path
 import pytest
 
 from streaming.temperature_sensor_generator import write_reading
+from streaming.temperature_sensor_with_timestamp_generator import (
+    write_reading as write_sensor_reading,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
@@ -153,3 +156,32 @@ class TestExamples:
         assert "25.5" in completed.stdout
         assert "33.0" in completed.stdout
         assert "10.5" not in completed.stdout
+
+    def test_should_run_streaming_average_temperature_from_several_sensors_example(self) -> None:
+        """Given the files of two sensors, the query prints the statistics of each one."""
+        directory = PROJECT_ROOT / "output" / "streaming"
+        shutil.rmtree(directory, ignore_errors=True)
+        directory.mkdir(parents=True)
+        for sensor, temperature in (("sensor_a", 10.0), ("sensor_a", 20.0), ("sensor_b", 33.0)):
+            write_sensor_reading(directory, sensor, temperature)
+
+        try:
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "-c",
+                    "from streaming.streaming_average_temperature_from_several_sensors import main;"
+                    " main(seconds=20)",
+                ],
+                cwd=PROJECT_ROOT,
+                capture_output=True,
+                text=True,
+                timeout=120,
+                check=True,
+            )
+        finally:
+            shutil.rmtree(directory, ignore_errors=True)
+
+        assert "sensor_a" in completed.stdout
+        assert "sensor_b" in completed.stdout
+        assert "15.0" in completed.stdout
