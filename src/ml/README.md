@@ -13,11 +13,14 @@ root (see the [main README](../../README.md)).
 | [svm_evaluation.py](svm_evaluation.py) | Load the saved model, predict labeled test points and measure the accuracy with `MulticlassClassificationEvaluator`. | The test points are not in the training data, so the accuracy measures how well the model generalizes. `transform` adds the columns `rawPrediction` and `prediction`. |
 | [svm_prediction.py](svm_prediction.py) | Load the saved model and classify new points that have no label, only an identifier. | It is how a model is used once trained: only `transform` is needed, no `fit` and no labels. |
 | [svm_classification_workflow.py](svm_classification_workflow.py) | The complete workflow on the Iris data: `randomSplit` into training and test sets, a `Pipeline` with `StandardScaler` and `LogisticRegression`, `fit`, accuracy on the test set, and saving and loading the `PipelineModel`. | The pipeline is fitted with the training set only, to avoid leaking information from the test set. The seed makes the split reproducible. |
+| [kmeans_training.py](kmeans_training.py) | Group the points of `data/classificationDataLibsvm.txt` in 2 clusters with `KMeans`, print the centers and save the model in `output/kmeans_model`. Run it first. | K-means is unsupervised: it ignores the label. The output shows the cluster of each point next to its real label, and both match. `fit` returns a model whose `transform` adds the column `prediction`. |
+| [kmeans_prediction.py](kmeans_prediction.py) | Load the saved k-means model, assign new points to a cluster and measure the clustering with the silhouette (`ClusteringEvaluator`). | There are no real classes to compare with, so the quality is measured with the silhouette, between -1 and 1: the closer to 1, the better separated the clusters are. |
+| [kmeans_choose_k.py](kmeans_choose_k.py) | Train k-means for several numbers of clusters (2 to 5) and compare their silhouettes to choose `k`. | K-means needs `k` in advance. The silhouette is highest for `k=2` and decreases afterwards, because the data has two groups. |
 
 ## About the data
 
 `data/classificationDataLibsvm.txt` is a small set of 13 points with two features and two
-classes (0 and 1), used by the SVM examples.
+classes (0 and 1), used by the SVM and k-means examples.
 
 `data/iris.libsvm` is the Iris data set (150 flowers of 3 classes, with 4 features: sepal and
 petal length and width, in centimeters) in LIBSVM format. It was generated from the original
