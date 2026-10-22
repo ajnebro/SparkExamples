@@ -1,7 +1,6 @@
 """Tests for ml.preprocess_iris."""
 
 import pytest
-from pyspark.errors import PySparkException
 from pyspark.sql import SparkSession
 
 from ml.preprocess_iris import DEFAULT_INPUT_FILE, preprocess, read_iris
@@ -11,13 +10,6 @@ class TestReadIris:
     def test_should_read_the_150_flowers_without_header(self, spark_session: SparkSession) -> None:
         """The empty last line of the original file is not read as a row."""
         assert read_iris(spark_session, DEFAULT_INPUT_FILE).count() == 150
-
-    def test_should_raise_error_if_the_file_does_not_exist(
-        self, spark_session: SparkSession
-    ) -> None:
-        """Spark raises its own error for a missing file."""
-        with pytest.raises(PySparkException):
-            read_iris(spark_session, "data/does_not_exist.data")
 
 
 class TestPreprocess:

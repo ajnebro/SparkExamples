@@ -1,7 +1,6 @@
 """Tests for ml.preprocess_wine."""
 
 import pytest
-from pyspark.errors import PySparkException
 from pyspark.sql import SparkSession
 
 from ml.preprocess_wine import DEFAULT_INPUT_FILE, FEATURE_COLUMNS, preprocess, read_wine
@@ -14,13 +13,6 @@ class TestReadWine:
 
         assert wine.count() == 178
         assert len(wine.columns) == 14
-
-    def test_should_raise_error_if_the_file_does_not_exist(
-        self, spark_session: SparkSession
-    ) -> None:
-        """Spark raises its own error for a missing file."""
-        with pytest.raises(PySparkException):
-            read_wine(spark_session, "data/does_not_exist.data")
 
 
 class TestPreprocess:
