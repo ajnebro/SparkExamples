@@ -39,15 +39,16 @@ environment.yml      Conda environment definition
 | Task                         | Command                                     |
 | ---------------------------- | ------------------------------------------- |
 | Install in editable mode     | `make install`                              |
-| Run tests                    | `make test` (`pytest tests/ -x`)            |
-| Run tests, skipping smoke    | `make test-fast`                            |
+| Run unit tests (fast)        | `make test`                                 |
+| Run integration tests (slow) | `make test-integration`                     |
+| Run all tests                | `make test-all`                             |
 | Lint                         | `make lint` (`ruff check`)                  |
 | Format                       | `make format` (`ruff format`)               |
-| Lint + format check + tests  | `make check`                                |
+| Lint + format + unit tests   | `make check` (`make check-all` adds the integration tests) |
 | Run an example               | `python -m rdd.add_numbers`                 |
 | Submit an example            | `spark-submit src/rdd/<file>.py`            |
 
-Run `make check` before proposing a commit.
+Run `make check` before proposing a commit, and `make check-all` when an example changes.
 
 ## Focus on Spark
 
@@ -95,8 +96,12 @@ This rule takes precedence over the general guidelines below when they conflict.
 - Use the shared session-scoped fixtures from [tests/conftest.py](tests/conftest.py):
   `spark_context` for RDD tests and `spark_session` (built on the same context) for DataFrame
   tests. Do not create a new context or session per test.
-- Every example also has a smoke test in `tests/rdd/test_examples_smoke.py` (marker `smoke`)
-  that runs it as a separate process; register new examples there.
+- Unit tests check the code of the project with small data in the shared Spark session, and
+  must stay fast. Do not test what Spark already tests: the ML algorithms (`fit`, `transform`,
+  evaluators), the aggregations or the joins. An example that only calls a Spark algorithm has
+  no unit tests; test its own logic (reading, preparing or reshaping data). Every example has an
+  integration test in `tests/integration/test_examples.py` (marker `integration`) that runs it
+  as a separate process; register new examples there.
 
 ## Documentation
 

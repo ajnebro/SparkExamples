@@ -111,17 +111,18 @@ spark-submit src/rdd/max_number.py
 
 | Task | Command |
 | ---- | ------- |
-| Run all tests | `make test` |
-| Run tests, skipping the slow smoke tests | `make test-fast` |
+| Run the unit tests (fast) | `make test` |
+| Run the integration tests (slow) | `make test-integration` |
+| Run all the tests | `make test-all` |
 | Lint | `make lint` |
 | Format | `make format` (`make format-check` only checks) |
-| Lint, format check and tests | `make check` |
+| Lint, format check and unit tests | `make check` (`make check-all` also runs the integration tests) |
 | Remove generated files | `make clean` |
 
 Tests use a local, session-scoped `SparkContext`, and a `SparkSession` built on it, defined in
-[tests/conftest.py](tests/conftest.py). The smoke tests in
-[tests/rdd/test_examples_smoke.py](tests/rdd/test_examples_smoke.py) run every example as a
-separate process; the airports examples are skipped if their data files have not been
+[tests/conftest.py](tests/conftest.py). The integration tests in
+[tests/integration/test_examples.py](tests/integration/test_examples.py) run every example as a
+separate process, in parallel; the airports examples are skipped if their data files have not been
 downloaded.
 
 ## Contributing

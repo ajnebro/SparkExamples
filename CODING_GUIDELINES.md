@@ -34,7 +34,8 @@ All source code, identifiers, and comments **must be written in English**.
   `make format-check`)
 - Use **Google-style docstrings** with Args / Returns / Raises
 - Clarity over cleverness: no "smart" one-liners
-- Every function has a docstring, and every example includes its tests
+- Every function has a docstring. Every example is registered in the integration tests, and the
+  code of the project that is not just a call to Spark also has unit tests
 
 ### Chained Spark calls
 
