@@ -19,6 +19,8 @@ root (see the [main README](../../README.md)).
 | [decision_tree.py](decision_tree.py) | Classify Iris with a `DecisionTreeClassifier` (`maxDepth=3`) trained with 70% of the data (`randomSplit` with a seed) and evaluated with the other 30%. | `toDebugString` prints the questions of the tree, and `featureImportances` shows that only the petal measurements are used. A tree can be read, unlike most models. |
 | [logistic_regression.py](logistic_regression.py) | Classify Iris with a `LogisticRegression`: print its parameters with `explainParams`, the coefficients of the model and the probability of each class. | With three classes the model is multinomial: one row of coefficients per class. The predicted class is the one with the highest probability. |
 | [linear_regression.py](linear_regression.py) | Predict the petal width of Iris from the other three measurements with `LinearRegression`, preparing the data with `VectorSlicer` and `vector_to_array`. | A regression predicts a number. RMSE (in centimeters) and R2 are computed on the training and the test sets, and are similar: the model does not overfit. |
+| [preprocess_iris.py](preprocess_iris.py) | Prepare the original Iris file of UCI (`data/iris.data`, CSV without header) for Spark ML: read it with an explicit schema, and use a `Pipeline` with `StringIndexer` (species to number) and `VectorAssembler` (measurements to a vector). | The result has the columns `label` and `features`, like the LIBSVM file. `StringIndexer` numbers by frequency unless `stringOrderType` is set; here it is alphabetical, because the three species are equally frequent. |
+| [preprocess_wine.py](preprocess_wine.py) | The same preparation for the Wine data (`data/wine.data`): the first column is the class (1 to 3) and the other 13 are chemical measurements. | The class is cast to string and indexed so that the labels start at 0. The measurements have very different scales (proline up to 1680, hue below 2), which matters for the algorithms that use distances or penalties. |
 
 ## About the data
 
@@ -35,3 +37,12 @@ data, published by the UCI Machine Learning Repository, replacing the class name
 - Dua, D. and Graff, C. [Iris](https://archive.ics.uci.edu/dataset/53/iris), UCI Machine Learning
   Repository. DOI: [10.24432/C56C76](https://doi.org/10.24432/C56C76). Licensed under
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+`data/iris.data` is the original file of the same data set, as published by UCI (150 lines and an
+empty last line, which Spark ignores).
+
+`data/wine.data` is the Wine data set (178 wines from three grape varieties, with 13 chemical
+measurements), as published by the UCI Machine Learning Repository
+([Wine](https://archive.ics.uci.edu/dataset/109/wine)). The original source is Forina, M. et al.,
+*PARVUS - An Extendible Package for Data Exploration, Classification and Correlation*, Institute
+of Pharmaceutical and Food Analysis and Technologies, Genoa, Italy.
