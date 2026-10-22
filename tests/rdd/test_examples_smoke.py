@@ -87,6 +87,31 @@ class TestExamples:
 
         assert expected_output in output
 
+    def test_should_train_evaluate_and_predict_with_the_svm_examples(
+        self, temporary_directory: Path
+    ) -> None:
+        """Given a trained model, the evaluation and the prediction examples can load it."""
+        model_directory = str(temporary_directory / "svm_model")
+
+        training = run_main("ml.svm_training", model_directory=model_directory)
+        evaluation = run_main("ml.svm_evaluation", model_directory=model_directory)
+        prediction = run_main("ml.svm_prediction", model_directory=model_directory)
+
+        assert "Model saved in" in training
+        assert "Accuracy = 1" in evaluation
+        assert "prediction" in prediction
+
+    def test_should_run_svm_classification_workflow_example(
+        self, temporary_directory: Path
+    ) -> None:
+        """Given the Iris data, the workflow prints its accuracy and saves the model."""
+        model_directory = temporary_directory / "iris_model"
+
+        output = run_main("ml.svm_classification_workflow", model_directory=str(model_directory))
+
+        assert "Test accuracy:" in output
+        assert (model_directory / "metadata").exists()
+
     def test_should_run_count_lines_example(self, temporary_directory: Path) -> None:
         """Given Don Quijote, the example counts words and writes the extracted lines."""
         output_directory = temporary_directory / "lines_with_word"
