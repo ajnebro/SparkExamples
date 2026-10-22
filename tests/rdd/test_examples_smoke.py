@@ -76,6 +76,8 @@ class TestExamples:
             ("ml.normalizer_example", "Normalized using the L1 norm"),
             ("ml.read_libsvm", "features: vector"),
             ("ml.remove_stop_words", "[saw, red, balloon]"),
+            ("ml.preprocess_iris", "Preprocessed data"),
+            ("ml.preprocess_wine", "Range of some measurements"),
             ("ml.decision_tree", "Test accuracy:"),
             ("ml.logistic_regression", "Coefficients, one row per class:"),
             ("ml.linear_regression", "test: RMSE = "),
