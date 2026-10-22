@@ -101,6 +101,22 @@ class TestExamples:
         assert "Accuracy = 1" in evaluation
         assert "prediction" in prediction
 
+    def test_should_train_and_use_the_kmeans_model(self, temporary_directory: Path) -> None:
+        """Given a trained model, the prediction example can load it."""
+        model_directory = str(temporary_directory / "kmeans_model")
+
+        training = run_main("ml.kmeans_training", model_directory=model_directory)
+        prediction = run_main("ml.kmeans_prediction", model_directory=model_directory)
+
+        assert "Model saved in" in training
+        assert "Silhouette = " in prediction
+
+    def test_should_run_kmeans_choose_k_example(self) -> None:
+        """Given the sample data, the example prints the best number of clusters."""
+        output = run_example("ml.kmeans_choose_k")
+
+        assert "Best k: 2" in output
+
     def test_should_run_svm_classification_workflow_example(
         self, temporary_directory: Path
     ) -> None:
