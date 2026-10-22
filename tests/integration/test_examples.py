@@ -1,4 +1,4 @@
-"""Smoke tests: every example runs end to end as a separate process.
+"""Integration tests: every example runs end to end as a separate process.
 
 The examples that read or write directories receive a temporary one, which is deleted as soon as
 the test ends, so the tests never touch `output/`: they do not interfere with, or delete, the
@@ -19,9 +19,9 @@ from streaming.temperature_sensor_with_timestamp_generator import (
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-STREAMING_SECONDS = 20
+STREAMING_SECONDS = 10
 
-pytestmark = pytest.mark.smoke
+pytestmark = pytest.mark.integration
 
 requires_airports = pytest.mark.skipif(
     not (PROJECT_ROOT / "data" / "airports.csv").exists(),
