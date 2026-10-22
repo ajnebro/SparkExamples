@@ -18,6 +18,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=8",
+    "pytest-xdist>=3",
     "ruff>=0.5",
 ]
 notebooks = [
@@ -32,7 +33,7 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [
-    "smoke: run each example as a separate process (slow)",
+    "integration: run each example as a separate process (slow)",
 ]
 
 [tool.ruff]
